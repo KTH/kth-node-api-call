@@ -6,7 +6,7 @@ Node module used to make JSON calls against APIs.
 To use in your node project, add the following line to your package.json:
 
 ```javascript
-"kth-api-call": "git+ssh://git@gita.sys.kth.se/Infosys/kth-api-call.git#version"
+"kth-api-call": "https://github.com/KTH/kth-api-call.git#version"
 ```
 
 Where 'version' is a commit hash, tag or release.
