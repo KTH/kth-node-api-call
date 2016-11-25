@@ -45,6 +45,7 @@ function BasicAPI (options, base) {
   this._redis = options.redis
   this._hasRedis = !!(this._redis && this._redis.client)
   this._basePath = options.basePath || ''
+  this._defaultTimeout = options.defaultTimeout || 2000
 }
 
 /**
@@ -285,6 +286,16 @@ function _exec (api, options, method, callback) {
 }
 
 function _createPromise (api, func, options) {
+  // Create a options object so we can add default timeout
+  if (typeof options !== 'object') {
+    options = {uri: options}
+  }
+
+  // If no timeout was set on this specific call we add default timeout
+  if (!options.timeout) {
+    options.timeout = api._defaultTimeout
+  }
+
   return new Promise((resolve, reject) => {
     func.call(api, options, _createPromiseCallback(resolve, reject))
   })
