@@ -239,7 +239,7 @@ function _wrapCallback (api, options, method, callback) {
 }
 
 function _exec (api, options, method, callback) {
-  if (api._hasRedis) {
+  if (api._hasRedis && options.useCache) {
     const key = _getKey(api, options, method)
 
     api._redis.client.get(key, (err, reply) => {
