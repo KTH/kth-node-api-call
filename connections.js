@@ -1,43 +1,36 @@
 const BasicAPI = require('./basic')
-module.exports = {
-  setup: _setup
-}
 
 // default logger if none is provided in the opts object to _setup
 const defaultLog = {}
 defaultLog.error = defaultLog.info = defaultLog.debug = defaultLog.warn = console.log
 const defaultTimeout = 30000
 
-/*
- * Check if there is a cache configured for this api
- */
-function _getRedisConfig (apiName, cache) {
-  if (cache && cache[ apiName ]) {
-    return cache[ apiName ]
-  }
-
-  return undefined
+module.exports = {
+  setup: _setup
 }
 
-/*
- * If configured to use nodeApi, i.e. api supporting KTH api standard and exposes a /_paths url
- * where the public URL is published.
- * Will download api specification from api and expose its methods internally under "/api" as paths objects
- */
-function _getRedisClient (apiName, opts) {
-  let cache = opts.cache ? opts.cache : {}
-  let redis = opts.redis
-  let log = opts.log || defaultLog
-  try {
-    if (cache[apiName]) {
-      const cacheConfig = _getRedisConfig(apiName, cache)
-      return redis(apiName, cacheConfig.redis)
-    }
-  } catch (err) {
-    log.error('Error creating Redis client', err)
-  }
+// populate an object with all api configurations and paths
+function _setup (apis, keys, opts) {
+  if (!opts) opts = {}
+  const endpoints = _createClients(apis, keys)
+  const output = {}
 
-  return Promise.reject(false)
+  _getPaths(endpoints, opts)
+  .then((results) => {
+    results.forEach((endpoint) => {
+      if (endpoint) {
+        output[ endpoint.key ] = endpoint
+      }
+    })
+    return output
+  })
+  .then(clients => {
+    return configureApiCache(clients, opts)
+  })
+  .catch((err) => {
+    throw err
+  })
+  return output
 }
 
 // unpack nodeApi:s and pair with keys, returns BasicAPI objects
@@ -122,26 +115,33 @@ function configureApiCache (clients, opts) {
   return clients
 }
 
-// populate an object with all api configurations and paths
-function _setup (apis, keys, opts) {
-  if (!opts) opts = {}
-  const endpoints = _createClients(apis, keys)
-  const output = {}
+/*
+ * Check if there is a cache configured for this api
+ */
+function _getRedisConfig (apiName, cache) {
+  if (cache && cache[ apiName ]) {
+    return cache[ apiName ]
+  }
+  return undefined
+}
 
-  _getPaths(endpoints, opts)
-  .then((results) => {
-    results.forEach((endpoint) => {
-      if (endpoint) {
-        output[ endpoint.key ] = endpoint
-      }
-    })
-    return output
-  })
-  .then(clients => {
-    return configureApiCache(clients, opts)
-  })
-  .catch((err) => {
-    throw err
-  })
-  return output
+/*
+ * If configured to use nodeApi, i.e. api supporting KTH api standard and exposes a /_paths url
+ * where the public URL is published.
+ * Will download api specification from api and expose its methods internally under "/api" as paths objects
+ */
+function _getRedisClient (apiName, opts) {
+  let cache = opts.cache ? opts.cache : {}
+  let redis = opts.redis
+  let log = opts.log || defaultLog
+  try {
+    if (cache[apiName]) {
+      const cacheConfig = _getRedisConfig(apiName, cache)
+      return redis(apiName, cacheConfig.redis)
+    }
+  } catch (err) {
+    log.error('Error creating Redis client', err)
+  }
+
+  return Promise.reject(false)
 }
