@@ -21,9 +21,7 @@ function _setup (apis, keys, opts) {
       if (endpoint) {
         output[ endpoint.key ] = endpoint
       }
-      if (opts.checkAPIs) {
-        _checkAPI(endpoint, opts.log || defaultLog)
-      }
+      
     })
     return output
   })
@@ -82,32 +80,37 @@ function _createClients (nodeApi, apiKey) {
 
 // get connect to all configured api endpoints
 function _getPaths (endpoints, opts) {
+  if (!opts.log) opts.log = defaultLog
+  if (!opts.timeout) opts.timeout = defaultTimeout
   const tasks = endpoints.map((api) => {              // for each endpoint
-    return _connect(api, opts.log || defaultLog, opts.reconnectTimeout || defaultTimeout)
+    return _connect(api, opts)
   })
   return Promise.all(tasks)
 }
 
 // connect to an api endpoint and get _paths
-function _connect (api, log, timeout) {
+function _connect (api, opts) {
   const uri = `${api.config.proxyBasePath}/_paths` // get the proxyBasePath eg. api/publications
   return api.client.getAsync(uri)                   // return the api paths for the api
   .then((data) => {
     if (data.statusCode === 200) {
       api.paths = data.body.api
       api.connected = true
-      log.info('Connected to api: ' + api.key)
+      opts.log.info('Connected to api: ' + api.key)
+      if (opts.checkAPIs) {
+        _checkAPI(api, opts.log || defaultLog)
+      }
       return api
     } else {
       throw new Error(data.statusCode + ' We can\'t access this API server. Check path and keys')
     }
   })
   .catch((err) => {
-    log.error({ err: err }, 'Failed to get API paths from API: ', api.key, 'host: ', api.config.host, ' proxyBasePath: ', api.config.proxyBasePath)
+    opts.log.error({ err: err }, 'Failed to get API paths from API: ', api.key, 'host: ', api.config.host, ' proxyBasePath: ', api.config.proxyBasePath)
     setTimeout(function () {
-      log.info('Reconnecting to api: ' + api.key)
-      _connect(api, log, timeout)
-    }, timeout)
+      opts.log.info('Reconnecting to api: ' + api.key)
+      _connect(api, opts)
+    }, opts.timeout)
     return api
   })
 }
