@@ -21,6 +21,9 @@ function _setup (apis, keys, opts) {
       if (endpoint) {
         output[ endpoint.key ] = endpoint
       }
+      if (opts.checkAPIs) {
+        _checkAPI(endpoint, opts.log || defaultLog)
+      }
     })
     return output
   })
@@ -31,6 +34,27 @@ function _setup (apis, keys, opts) {
     throw err
   })
   return output
+}
+
+// check API key and kill if api is required
+function _checkAPI (endpoint, log) {
+  const config = endpoint.config
+  const apiName = endpoint.key
+  const uri = `${config.proxyBasePath}/_checkAPIkey` // get the proxyBasePath eg. api/publications
+  endpoint.client.getAsync({uri: uri})
+  .then(res => {
+    if (res.statusCode === 401) {
+      log.error('Bad API key for ' + apiName)
+      if (config.required) {
+        log.error('Required API misconfigured, EXITING')
+        process.exit(1)
+      }
+    } else if (res.statusCode === 404) {
+      log.error('Check API functionality not implemented on ' + apiName)
+    } else if (res.statusCode === 500) {
+      log.error('Got 500 response on checkAPI call, most likely a bad API key for ' + apiName)
+    }
+  })
 }
 
 // unpack nodeApi:s and pair with keys, returns BasicAPI objects
