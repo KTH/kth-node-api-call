@@ -1,15 +1,92 @@
-kth-api-call
+kth-node-api-call
 ============
+
+# Overview
 
 Node module used to make JSON calls against APIs.
 
 To use in your node project, add the following line to your package.json:
 
 ```javascript
-"kth-api-call": "https://github.com/KTH/kth-api-call.git#version"
+"kth-node-api-call": "https://github.com/KTH/kth-node-api-call.git#version"
 ```
 
 Where 'version' is a commit hash, tag or release.
+
+## Setup
+In your init callback to the express web server, this should happen:
+
+```
+const connections = require('kth-node-api-call').Connections
+
+const nodeApi = {
+  namedApi: {
+    host: 'localhost', // api hostname
+    https: false, // use ssl? 
+    port: 3001, // api port
+    proxyBasePath: '/api/applicationName', // api base path
+    required: true, // is the api required? Optional, defaults to false
+    defaultTimeout: 2000, // milliseconds. Optional, defaults to 2000
+    }
+}
+
+const cacheConfig = {
+  namedApi: {
+    redis: {
+      host: 'localhost',
+      port: 6379
+    }
+  }
+}
+
+const apiKey = {
+  namedApi; '1234'
+}
+
+const options = {
+  reconnectTimeout: 5000, // milliseconds
+  log: myLogger, // your logger instance
+  redis: myRedis, // your redis instance
+  cache: cacheConfig, // your api cache options
+  checkAPIs: true 
+}
+// either
+module.exports = connections.setup(nodeApi, apiKey, options)
+// or
+const api = connections.setup(nodeApi, apiKey, options)
+```
+
+### Note
+The checkAPIs option requires that the API implements a checkAPIKey route, see [node-api](https://www.github.com/KTH/node-api.git)
+
+
+## Usage
+
+Wherever you need to call your api, use something on the form of:
+
+```
+const paths = api.namedApi.paths
+const client = api.namedApi.client
+
+// user is a uri parameter
+client.getAsync(client.resolve(paths.[YOUR_ENDPOINT], {user: username, etc...}))
+.then(response => {
+  // do something with result
+})
+
+```
+
+if you want to use a cached api, add the option `{useCache: true}` to the `getAsync` call like this:
+```
+client.getAsync([FULL_PATH], {useCache: true})
+.then(response => {
+  // etc.
+})
+```
+
+
+
+# Outdated Readme
 
 To use:
 
