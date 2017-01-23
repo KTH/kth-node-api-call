@@ -1,6 +1,5 @@
-// To keep backward compatibility
-module.exports = require('./api')
 module.exports = {
+  api: require('./api'),
   Connections: require('./connections'),
   oidcApi: require('./oidcApi'),
   cachedApi: require('./cachedApi'),
