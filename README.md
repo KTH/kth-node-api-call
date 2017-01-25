@@ -84,45 +84,6 @@ client.getAsync([FULL_PATH], {useCache: true})
 })
 ```
 
-
-
-# Outdated Readme
-
-To use:
-
-```javascript
-var api = require('kth-api-call');
-
-var ApiCall = api(
-  {
-    host : 'www.examplehost.com',
-    path : '/example/path'
-  }
-);
-
-ApiCall.request(
-  function(data) { 
-    // Called on success
-    // data is a JSON object with the response data
-  }, 
-  function(err) { 
-    // Called on error
-    // err contains the error message
-  }
-);
-```
-
-The configuration parameter sent to the module can consist of the following:
-
-*  port : int / default: 443
-*  method : string / default: GET
-*  host : string / default: none / MANDATORY
-*  path : string / default: '/'
-*  debugMode : boolean / default: false
-*  https : boolean / default: true
-*  headers : object / default: undefined
-*  json : boolean / default: false
-
 ## BasicAPI
 
 This is a more straightforward wrapper around [request][request]. It will allow

@@ -29,10 +29,10 @@ function setup (apisConfig, apisKeyConfig, opts) {
       api.connected = true
       return Promise.resolve(api)
     })
-  
+
   const apisWithoutPaths = apis.filter(api => !api.paths)
   const remoteConnectedApis = getPathsRemote(apisWithoutPaths, opts)
-  
+
   const allConnectedApis = Promise.all(remoteConnectedApis.concat(connectedApis))
 
   allConnectedApis
