@@ -1,20 +1,13 @@
 /* eslint-env mocha */
 
 const expect = require('chai').expect
+const redis = require('redis-mock')
+const redisClient = redis.createClient()
 const sinon = require('sinon')
 
 const nock = require('nock')
 
 const mockAPI = nock('http://localhost:3001').get('/api/test/_paths').reply(200, {
-  path1: {
-    uri: '/api/test/v1/path1/:param1',
-    method: 'GET',
-    apikey: {
-      scope_required: true,
-      scopes: ['read'],
-      type: 'api_key'
-    }
-  }
 }).get('/api/test/_checkAPIkey').reply(401, {})
 
 const mockApiConfig = {
@@ -36,16 +29,20 @@ mockLogger.debug = mockLogger.error = mockLogger.warn = mockLogger.info = () => 
 
 const opts = {
   log: mockLogger,
-  // redis: redis,
+  redis: function () {
+    return Promise.resolve(redisClient)
+  },
   // reconnectTimeout: 30000,
-  // cache: config.cache,
+  cache: {
+    testApi: mockApiConfig
+  },
   checkAPIs: true // performs api-key checks against the apis, if a 'required' check fails, the app will exit. Required apis are specified in the config
 }
 
 const connections = require('../connections')
 
 describe('Testing api', function () {
-  it('should set up connections', function (done) {
+  it('should shut down on bad API key', function (done) {
     this.originalProcess = process.exit
     Object.defineProperty(process, 'exit', { // mocking out process globally
       value: sinon.spy()
@@ -62,7 +59,17 @@ describe('Testing api', function () {
       value: this.originalProcess
     })
     mockAPI
-    .get('/api/test/_paths').reply(200, {})
+    .get('/api/test/_paths').reply(200, {
+      path1: {
+        uri: '/api/test/v1/path1/:param1',
+        method: 'GET',
+        apikey: {
+          scope_required: true,
+          scopes: ['read'],
+          type: 'api_key'
+        }
+      }
+    })
     .get('/api/test/_checkAPIkey').reply(200, {})
     const output = connections.setup(mockApiConfig, mockApiKeyConfig, opts)
     setTimeout(function () {
