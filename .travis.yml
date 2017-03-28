@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+- '6.1'
+deploy:
+  provider: npm
+  email: webmaster-private@kth.se
+  api_key:
+    secure: a5bjvG2V80JHnOSwlagK4i/J4LLo1ItsvyXPdS0m3BzEKp+vrspe86axg9Xq4YHc0f+P8sBpInAAKjUDXQdzDc6UbzaxW0j4WCt7Hy+dGphbkVOBcWgRZPbh4Gzz00TsHCxb8wq3QBjceV6fhCJ7Xy5ec2EUR7br/FxuyjmUifoHG08+4/pr+Z0ER7u72mRd+b912WVklCNEPDcMQ8QUK+vamAn01UHCB1kKrKd6tVLhEg2CMlmwT5dzaIJgOZfpmYTvbfglXzHEEqtDzr12gkZThqwN5qsOX0lq17DqNAWPlX+4A7yKceZwR5fDyXDF0Oxhrv+GqYh6BlLr4qbIHqjLfcdsijfEzHts26Tjzh7JsWgWVKwhp0ONnnmPAoBfKeK1rfZZU3iJ4BlItfytSsBWzhAS6eGDyWk8pZij48Qq3oUce+fze/IlwLc4HmRjk5jSF0Bkoo69iL7U66XO/CMpMrapnJ4J6GeCRWOSKkHpZPQLEZ34mrzeORtXQ/qBZrXOUGkGT4OJbIPrRMR5cCQCSuX5wYq6LYuuNAMZgno0pNChFv46sqNxQ6qcJI3S0f80AVGtufEO5mNoDA12s/u78MelR5xEYVMvwUNGleABfH0PEnLYUyNUGkoLFZkDnNq6AfUkYsJZJ6hc88J8Tz7xavlhI0DNBFhqwUNpa58=
+  on:
+    tags: true
+    repo: KTH/kth-node-api-call
