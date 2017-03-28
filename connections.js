@@ -1,3 +1,5 @@
+'use strict'
+
 const BasicAPI = require('./basic')
 const path = require('path')
 
