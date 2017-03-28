@@ -32,7 +32,7 @@ const opts = {
   redis: function () {
     return Promise.resolve(redisClient)
   },
-  // reconnectTimeout: 30000,
+  timeout: 100,
   cache: {
     testApi: mockApiConfig
   },
@@ -49,17 +49,43 @@ describe('Testing api', function () {
     })
     const output = connections.setup(mockApiConfig, mockApiKeyConfig, opts)
     setTimeout(function () {
-      expect(output.testApi.connected).to.be.true
       expect(process.exit.called).to.be.true
       done()
     }, 500) // wait for setup to finish
   })
+
   it('should set up connections', function (done) {
     Object.defineProperty(process, 'exit', { // undo previous exit override
       value: this.originalProcess
     })
     mockAPI
     .get('/api/test/_paths').reply(200, {
+      path1: {
+        uri: '/api/test/v1/path1/:param1',
+        method: 'GET',
+        apikey: {
+          scope_required: true,
+          scopes: ['read'],
+          type: 'api_key'
+        }
+      }
+    })
+    .get('/api/test/_checkAPIkey').reply(200, {})
+    const output = connections.setup(mockApiConfig, mockApiKeyConfig, opts)
+    setTimeout(function () {
+      expect(output.testApi.connected).to.be.true
+      done()
+    }, 500) // wait for setup to finish
+  })
+
+  it('should retry the api connection if it doesn\'t gets a bad status code response', function (done) {
+    mockAPI
+    .get('/api/test/_paths')
+    .reply(503, {
+      message: 'Service Unavailable'
+    })
+    .get('/api/test/_paths')
+    .reply(200, {
       path1: {
         uri: '/api/test/v1/path1/:param1',
         method: 'GET',
