@@ -207,5 +207,5 @@ function getRedisClient (apiName, opts) {
     opts.log.error('Error creating Redis client', err)
   }
 
-  return Promise.reject(false)
+  return false
 }
