@@ -23,7 +23,7 @@ function setup (apisConfig, apisKeyConfig, opts) {
   if (!opts.timeout) opts.timeout = defaultTimeout
   const output = {}
 
-  const apis = createApis(apisConfig, apisKeyConfig)
+  const apis = createApis(apisConfig, apisKeyConfig, opts)
 
   const connectedApis = apis
     .filter(api => api.paths)
@@ -91,7 +91,7 @@ function checkAPI (api, log) {
 }
 
 // unpack nodeApi:s and pair with keys, returns BasicAPI objects
-function createApis (apisConfig, apisKeyConfig) {
+function createApis (apisConfig, apisKeyConfig, apiOpts) {
   return Object.keys(apisConfig).map((key) => {
     const apiConfig = apisConfig[ key ]
     const opts = {
@@ -99,16 +99,15 @@ function createApis (apisConfig, apisKeyConfig) {
       port: apiConfig.port,
       https: apiConfig.https,
       json: true,
-      defaultTimeout: apiConfig.defaultTimeout
+      defaultTimeout: apiConfig.defaultTimeout,
+      headers: apiOpts.customHeaders || {}
     }
 
     if (apiConfig.useApiKey !== false) {
       const k = apisKeyConfig[ key ]
       if (!k) throw new Error(`nodeApi ${key} has no api key set.`)
 
-      opts.headers = {
-        'api_key': apisKeyConfig[key]
-      }
+      opts.headers['api_key'] = apisKeyConfig[key]
     }
 
     const api = {
