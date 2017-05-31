@@ -57,8 +57,8 @@ const api = connections.setup(nodeApi, apiKey, options)
 ```
 
 ### Note
-The checkAPIs option requires that the API implements a checkAPIKey route, see [node-api](https://www.github.com/KTH/node-api.git)
-
+The checkAPIs option requires that the API implements a checkAPIkey route, see [node-api](https://www.github.com/KTH/node-api.git)
+The endpoint can be overridden by setting the `statusCheckPath` property on the api config object
 
 ## Usage
 
