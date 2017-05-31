@@ -1,7 +1,7 @@
 'use strict'
 
 const BasicAPI = require('./basic')
-const path = require('path')
+const urlJoin = require('url-join')
 
 // default logger if none is provided in the opts object to _setup
 const defaultLog = {}
@@ -64,7 +64,7 @@ function checkAPI (api, log) {
   const apiName = api.key
 
   const statusCheckPath = api.config.statusCheckPath || '_checkAPIkey'
-  const uri = path.join(config.proxyBasePath, statusCheckPath)
+  const uri = urlJoin(config.proxyBasePath, statusCheckPath)
   api.client.getAsync({uri})
     .then(res => {
       if (config.useApiKey !== false) {

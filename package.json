@@ -20,7 +20,8 @@
   ],
   "dependencies": {
     "q": "^1.4.1",
-    "request": "^2.72.0"
+    "request": "^2.72.0",
+    "url-join": "^2.0.2"
   },
   "devDependencies": {
     "chai": "^3.5.0",
