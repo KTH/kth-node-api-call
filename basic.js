@@ -230,8 +230,8 @@ function _wrapCallback (api, options, method, callback) {
     if (api._hasRedis && res.statusCode >= 200 && res.statusCode < 400) {
       const key = _getKey(api, options, method)
       const value = JSON.stringify(res)
-      api._redis.client.set(key, value)
-      api._redis.client.expire(key, api._redis.expire || 300)
+      api._redis.client.set(key, value, (err, res) => { if (err) callback(err) })
+      api._redis.client.expire(key, api._redis.expire || 300, (err, res) => { if (err) callback(err) })
     }
 
     callback(err, res, body)
