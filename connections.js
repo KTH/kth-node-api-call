@@ -135,6 +135,12 @@ function getPathsRemote (apis, opts) {
 
 // get all api-paths from the /_paths endpoint
 function connect (api, opts) {
+  // Allow connecting to non node-api servers
+  if (api.config.doNotCallPathsEndpoint) {
+    api.connected = true
+    return Promise.resolve(api)
+  }
+
   const uri = `${api.config.proxyBasePath}/_paths` // get the proxyBasePath eg. api/publications
   return api.client.getAsync(uri)                   // return the api paths for the api
     .then((data) => {
