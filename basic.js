@@ -1,6 +1,7 @@
 'use strict'
 
 const request = require('request')
+const querystring = require('querystring')
 const url = require('url')
 
 /**
@@ -205,7 +206,15 @@ BasicAPI.prototype.resolve = function (uri, params) {
 
 function _getKey (api, options, method) {
   const prefix = api._redis.prefix ? api._redis.prefix + ':' : ''
-  return prefix + method + ':' + _getURI(api, options)
+  let query = ''
+  if (options.qs) {
+    if (typeof options.qs === 'string') {
+      query += '?' + options.qs
+    } else {
+      query += '?' + querystring.stringify(options.qs)
+    }
+  }
+  return prefix + method + ':' + _getURI(api, options) + query
 }
 
 function _getURI (api, options) {
