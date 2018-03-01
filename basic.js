@@ -239,8 +239,15 @@ function _wrapCallback (api, options, method, callback) {
     if (api._hasRedis && res.statusCode >= 200 && res.statusCode < 400) {
       const key = _getKey(api, options, method)
       const value = JSON.stringify(res)
-      api._redis.client.set(key, value, (err, res) => { if (err) callback(err) })
-      api._redis.client.expire(key, api._redis.expire || 300, (err, res) => { if (err) callback(err) })
+
+      const redisMaybeFnc = typeof api._redis.client === 'function' ? api._redis.client() : api._redis.client
+
+      Promise.resolve(redisMaybeFnc).then(client => {
+        client.set(key, value, (err, res) => { if (err) { callback(err) } })
+        client.expire(key, api._redis.expire || 300, (err, res) => { if (err) callback(err) })
+      }).catch(err => {
+        callback(err)
+      })
     }
 
     callback(err, res, body)
@@ -251,35 +258,29 @@ function _exec (api, options, method, callback) {
   if (api._hasRedis && options.useCache) {
     const key = _getKey(api, options, method)
 
-    api._redis.client.get(key, (err, reply) => {
-      if (err) {
-        callback(err)
-        return
-      }
+    const redisMaybeFnc = typeof api._redis.client === 'function' ? api._redis.client() : api._redis.client
 
-      if (!reply) {
-        const uri = _getURI(api, options)
-
-        if (typeof options === 'string') {
-          options = {
-            uri: uri
-          }
-        } else {
-          options.uri = uri
-        }
-
-        callback = _wrapCallback(api, options, method, callback)
-        api._request[ method ](options, callback)
-        return
-      }
-
-      const value = JSON.parse(reply)
-      callback(null, value, value.body)
-    })
-
-    return
+    Promise.resolve(redisMaybeFnc)
+      .then(client => {
+        return new Promise((resolve, reject) => {
+          client.get(key, (err, reply) => {
+            if (err) {
+              reject(err)
+            } else {
+              const value = JSON.parse(reply)
+              resolve(callback(null, value, value.body))
+            }
+          })
+        })
+      }).catch(() => {
+        return _makeRequest(api, options, method, callback)
+      })
+  } else {
+    _makeRequest(api, options, method, callback)
   }
+}
 
+function _makeRequest (api, options, method, callback) {
   const uri = _getURI(api, options)
 
   if (typeof options === 'string') {

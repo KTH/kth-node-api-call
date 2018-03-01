@@ -168,11 +168,11 @@ function configureApiCache (connectedApi, opts) {
   const apiName = connectedApi.key
   if (getRedisConfig(apiName, opts.cache)) {
     getRedisClient(apiName, opts)
-    .then(redisClient => {
+    .then((getRedisClientFnc) => {
       connectedApi.client._hasRedis = true
       connectedApi.client._redis = {
         prefix: apiName,
-        client: redisClient,
+        client: getRedisClientFnc,
         expire: getRedisConfig(apiName, opts.cache).expireTime
       }
     })
@@ -201,16 +201,17 @@ function getRedisConfig (apiName, cache) {
  * Will download api specification from api and expose its methods internally under "/api" as paths objects
  */
 function getRedisClient (apiName, opts) {
-  let cache = opts.cache ? opts.cache : {}
-  let redis = opts.redis
-  try {
-    if (cache[apiName]) {
-      const cacheConfig = getRedisConfig(apiName, cache)
-      return redis(apiName, cacheConfig.redis)
+  return new Promise((resolve, reject) => {
+    let cache = opts.cache ? opts.cache : {}
+    let redis = opts.redis
+    try {
+      if (cache[apiName]) {
+        const cacheConfig = getRedisConfig(apiName, cache)
+        resolve(() => redis(apiName, cacheConfig.redis))
+      }
+    } catch (err) {
+      opts.log.error('Error creating Redis client', err)
+      reject(err)
     }
-  } catch (err) {
-    opts.log.error('Error creating Redis client', err)
-  }
-
-  return false
+  })
 }
