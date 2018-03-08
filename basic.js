@@ -267,8 +267,10 @@ function _exec (api, options, method, callback) {
             if (err) {
               reject(err)
             } else {
+              // TODO: Should we catch parse errors and return a reasonable message or
+              // is this good enough?
               const value = JSON.parse(reply)
-              resolve(callback(null, value, value.body))
+              resolve(callback(null, value, value && value.body))
             }
           })
         })
