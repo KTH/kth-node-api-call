@@ -264,13 +264,13 @@ function _exec (api, options, method, callback) {
       .then(client => {
         return new Promise((resolve, reject) => {
           client.get(key, (err, reply) => {
-            if (err) {
+            if (err || !reply) {
               reject(err)
             } else {
               // TODO: Should we catch parse errors and return a reasonable message or
               // is this good enough?
               const value = JSON.parse(reply)
-              resolve(callback(null, value, value && value.body))
+              resolve(callback(null, value, value.body))
             }
           })
         })
