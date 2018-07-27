@@ -150,7 +150,12 @@ function connect (api, opts) {
         opts.log.info('Connected to api: ' + api.key)
         return api
       } else {
-        throw new Error(data.statusCode + ' We can\'t access this API server. Check path and keys')
+        opts.log.warn(data.statusCode + ' We had problems accessing ' + api.key + '. Check path and keys if this issue persists. We will retry in ' + opts.timeout + 'ms')
+        setTimeout(function () {
+          opts.log.info('Reconnecting to api: ' + api.key)
+          connect(api, opts)
+        }, opts.timeout)
+        return api
       }
     })
     .catch((err) => {
