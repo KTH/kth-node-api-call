@@ -44,7 +44,7 @@ const apiKey = {
 }
 
 const options = {
-  reconnectTimeout: 5000, // milliseconds
+  timeout: 5000, // milliseconds, retry interval if getting API-paths fails
   log: myLogger, // your logger instance
   redis: myRedis, // your redis instance
   cache: cacheConfig, // your api cache options
