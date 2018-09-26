@@ -47,6 +47,42 @@ function BasicAPI (options, base) {
   this._hasRedis = !!(this._redis && this._redis.client)
   this._basePath = options.basePath || ''
   this._defaultTimeout = options.defaultTimeout || 2000
+  this._retryOnESOCKETTIMEDOUT = options.retryOnESOCKETTIMEDOUT ? options.retryOnESOCKETTIMEDOUT : undefined
+  this._maxNumberOfRetries = options.maxNumberOfRetries ? options.maxNumberOfRetries : 5
+  this._log = options.log
+}
+
+const hasESOCKETTIMEDOUT = e => {
+  if (typeof e === 'object') {
+    const keys = Object.getOwnPropertyNames(e)
+    for (let i = 0; i < keys.length; i++) {
+      if (e[keys[i]].toString().includes('ESOCKETTIMEDOUT')) {
+        return true
+      }
+    }
+  } else {
+    return e.includes('ESOCKETTIMEDOUT')
+  }
+}
+
+const retryWrapper = (_this, cb, args) => {
+  let counter = 0
+  const sendRequest = () => {
+    return cb.apply(_this, args)
+        .catch(e => {
+          if (hasESOCKETTIMEDOUT(e) && counter < _this._maxNumberOfRetries) {
+            counter++
+            _this._log.warn(`Request to "${args[2]}" failed, Retry ${counter}/${_this._maxNumberOfRetries}`)
+            return sendRequest()
+          } else if (hasESOCKETTIMEDOUT(e)) {
+            throw new Error(`ESOCKETTIMEDOUT, The request failed after ${counter} retries. The connection to the API seems to be overloaded.`)
+          } else {
+            throw e
+          }
+        })
+  }
+
+  return sendRequest()
 }
 
 /**
@@ -65,6 +101,10 @@ BasicAPI.prototype.get = function (options, callback) {
  * @returns {Promise}
  */
 BasicAPI.prototype.getAsync = function (options) {
+  if (this._retryOnESOCKETTIMEDOUT) {
+    return retryWrapper(this, _createPromise, [this, this.get, options])
+  }
+
   return _createPromise(this, this.get, options)
 }
 
@@ -84,6 +124,10 @@ BasicAPI.prototype.post = function (options, callback) {
  * @returns {Promise}
  */
 BasicAPI.prototype.postAsync = function (options) {
+  if (this._retryOnESOCKETTIMEDOUT) {
+    return retryWrapper(this, _createPromise, [this, this.post, options])
+  }
+
   return _createPromise(this, this.post, options)
 }
 
@@ -103,6 +147,10 @@ BasicAPI.prototype.put = function (options, callback) {
  * @returns {Promise}
  */
 BasicAPI.prototype.putAsync = function (options) {
+  if (this._retryOnESOCKETTIMEDOUT) {
+    return retryWrapper(this, _createPromise, [this, this.put, options])
+  }
+
   return _createPromise(this, this.put, options)
 }
 
@@ -122,6 +170,10 @@ BasicAPI.prototype.del = function (options, callback) {
  * @returns {Promise}
  */
 BasicAPI.prototype.delAsync = function (options) {
+  if (this._retryOnESOCKETTIMEDOUT) {
+    return retryWrapper(this, _createPromise, [this, this.del, options])
+  }
+
   return _createPromise(this, this.del, options)
 }
 
@@ -141,6 +193,10 @@ BasicAPI.prototype.head = function (options, callback) {
  * @returns {Promise}
  */
 BasicAPI.prototype.headAsync = function (options) {
+  if (this._retryOnESOCKETTIMEDOUT) {
+    return retryWrapper(this, _createPromise, [this, this.head, options])
+  }
+
   return _createPromise(this, this.head, options)
 }
 
@@ -160,6 +216,10 @@ BasicAPI.prototype.patch = function (options, callback) {
  * @returns {Promise}
  */
 BasicAPI.prototype.patchAsync = function (options) {
+  if (this._retryOnESOCKETTIMEDOUT) {
+    return retryWrapper(this, _createPromise, [this, this.patch, options])
+  }
+
   return _createPromise(this, this.patch, options)
 }
 

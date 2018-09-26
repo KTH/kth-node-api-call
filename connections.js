@@ -100,7 +100,10 @@ function createApis (apisConfig, apisKeyConfig, apiOpts) {
       https: apiConfig.https,
       json: true,
       defaultTimeout: apiConfig.defaultTimeout,
-      headers: apiOpts.customHeaders || {}
+      headers: apiOpts.customHeaders || {},
+      retryOnESOCKETTIMEDOUT: apiOpts.retryOnESOCKETTIMEDOUT,
+      maxNumberOfRetries: apiOpts.maxNumberOfRetries,
+      log: apiOpts.log || {}
     }
 
     if (apiConfig.useApiKey !== false) {
