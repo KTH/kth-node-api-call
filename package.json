@@ -9,7 +9,7 @@
   },
   "scripts": {
     "preversion": "npm run codecheck && npm run test",
-    "test": "mocha tests/**",
+    "test": "mocha tests/** --exit",
     "postversion": "git push && git push --tags",
     "codecheck": "standard",
     "codefix": "standard --fix"
