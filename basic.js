@@ -69,17 +69,17 @@ const retryWrapper = (_this, cb, args) => {
   let counter = 0
   const sendRequest = () => {
     return cb.apply(_this, args)
-        .catch(e => {
-          if (hasESOCKETTIMEDOUT(e) && counter < _this._maxNumberOfRetries) {
-            counter++
-            _this._log.warn(`Request to "${args[2]}" failed, Retry ${counter}/${_this._maxNumberOfRetries}`)
-            return sendRequest()
-          } else if (hasESOCKETTIMEDOUT(e)) {
-            throw new Error(`ESOCKETTIMEDOUT, The request failed after ${counter} retries. The connection to the API seems to be overloaded.`)
-          } else {
-            throw e
-          }
-        })
+      .catch(e => {
+        if (hasESOCKETTIMEDOUT(e) && counter < _this._maxNumberOfRetries) {
+          counter++
+          _this._log.warn(`Request to "${args[2]}" failed, Retry ${counter}/${_this._maxNumberOfRetries}`)
+          return sendRequest()
+        } else if (hasESOCKETTIMEDOUT(e)) {
+          throw new Error(`ESOCKETTIMEDOUT, The request failed after ${counter} retries. The connection to the API seems to be overloaded.`)
+        } else {
+          throw e
+        }
+      })
   }
 
   return sendRequest()
@@ -360,7 +360,7 @@ function _makeRequest (api, options, method, callback) {
 function _createPromise (api, func, options) {
   // Create a options object so we can add default timeout
   if (typeof options !== 'object') {
-    options = {uri: options}
+    options = { uri: options }
   }
 
   // If no timeout was set on this specific call we add default timeout

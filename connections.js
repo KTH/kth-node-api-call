@@ -65,7 +65,7 @@ function checkAPI (api, log) {
 
   const statusCheckPath = api.config.statusCheckPath || '_checkAPIkey'
   const uri = urlJoin(config.proxyBasePath, statusCheckPath)
-  api.client.getAsync({uri})
+  api.client.getAsync({ uri })
     .then(res => {
       if (config.useApiKey !== false) {
         if (res.statusCode === 401) {
@@ -145,7 +145,7 @@ function connect (api, opts) {
   }
 
   const uri = `${api.config.proxyBasePath}/_paths` // get the proxyBasePath eg. api/publications
-  return api.client.getAsync(uri)                   // return the api paths for the api
+  return api.client.getAsync(uri) // return the api paths for the api
     .then((data) => {
       if (data.statusCode === 200) {
         api.paths = data.body.api
@@ -176,18 +176,18 @@ function configureApiCache (connectedApi, opts) {
   const apiName = connectedApi.key
   if (getRedisConfig(apiName, opts.cache)) {
     getRedisClient(apiName, opts)
-    .then((getRedisClientFnc) => {
-      connectedApi.client._hasRedis = true
-      connectedApi.client._redis = {
-        prefix: apiName,
-        client: getRedisClientFnc,
-        expire: getRedisConfig(apiName, opts.cache).expireTime
-      }
-    })
-    .catch(err => {
-      opts.log.error('Unable to create redisClient', {error: err})
-      connectedApi.client._hasRedis = false
-    })
+      .then((getRedisClientFnc) => {
+        connectedApi.client._hasRedis = true
+        connectedApi.client._redis = {
+          prefix: apiName,
+          client: getRedisClientFnc,
+          expire: getRedisConfig(apiName, opts.cache).expireTime
+        }
+      })
+      .catch(err => {
+        opts.log.error('Unable to create redisClient', { error: err })
+        connectedApi.client._hasRedis = false
+      })
     opts.log.debug(`API configured to use redis cache: ${apiName}`)
   }
   return connectedApi

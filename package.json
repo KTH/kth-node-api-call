@@ -11,7 +11,8 @@
     "preversion": "npm run codecheck && npm run test",
     "test": "mocha tests/**",
     "postversion": "git push && git push --tags",
-    "codecheck": "standard"
+    "codecheck": "standard",
+    "codefix": "standard --fix"
   },
   "keywords": [
     "api",
