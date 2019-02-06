@@ -1,4 +1,4 @@
-kth-node-api-call
+KTH Node API Call
 ============
 
 # Overview
