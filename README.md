@@ -1,5 +1,4 @@
-KTH Node API Call
-============
+# KTH Node API Call
 
 # Overview
 
@@ -7,22 +6,23 @@ Node module used to make JSON calls against APIs.
 
 To use in your node project, add the following line to your package.json:
 
-```javascript
+```json
 "kth-node-api-call": "https://github.com/KTH/kth-node-api-call.git#version"
 ```
 
 Where 'version' is a commit hash, tag or release.
 
 ## Setup
+
 In your init callback to the express web server, this should happen:
 
-```
+```javascript
 const connections = require('kth-node-api-call').Connections
 
 const nodeApi = {
   namedApi: {
     host: 'localhost', // api hostname
-    https: false, // use ssl? 
+    https: false, // use ssl?
     port: 3001, // api port
     proxyBasePath: '/api/applicationName', // api base path
     required: true, // is the api required? Optional, defaults to false
@@ -48,7 +48,7 @@ const options = {
   log: myLogger, // your logger instance
   redis: myRedis, // your redis instance
   cache: cacheConfig, // your api cache options
-  checkAPIs: true 
+  checkAPIs: true
 }
 // either
 module.exports = connections.setup(nodeApi, apiKey, options)
@@ -57,6 +57,7 @@ const api = connections.setup(nodeApi, apiKey, options)
 ```
 
 ### Note
+
 The checkAPIs option requires that the API implements a checkAPIkey route, see [node-api](https://www.github.com/KTH/node-api.git)
 The endpoint can be overridden by setting the `statusCheckPath` property on the api config object
 
@@ -64,7 +65,7 @@ The endpoint can be overridden by setting the `statusCheckPath` property on the 
 
 Wherever you need to call your api, use something on the form of:
 
-```
+```javascript
 const paths = api.namedApi.paths
 const client = api.namedApi.client
 
@@ -77,7 +78,8 @@ client.getAsync(client.resolve(paths.[YOUR_ENDPOINT], {user: username, etc...}))
 ```
 
 if you want to use a cached api, add the option `{useCache: true}` to the `getAsync` call like this:
-```
+
+```javascript
 client.getAsync([FULL_PATH], {useCache: true})
 .then(response => {
   // etc.
@@ -96,44 +98,45 @@ For more details see the examples below and [the source code][basicjs].
 // configure this and re-use throughout your app
 
 const api = new BasicAPI({
-  hostname: 'localhost',
+  hostname: "localhost",
   port: 3001,
   json: true,
   https: false,
   headers: {
-    'api_key': 'abcd'
-  },
+    api_key: "abcd"
+  }
   // optionally enable redis for response caching
   // redis: {
   //   client: redisClient,
   //   prefix: 'node-api',
   //   expire: 120
   // }
-})
+});
 
 // usage example:
 
-const params = { id: 123 }
-const uri = api.resolve('/value/:id', params)
+const params = { id: 123 };
+const uri = api.resolve("/value/:id", params);
 
 // promise
-api.getAsync(uri)
-    .then((response) => {
-      if (response.statusCode >= 200 && response.statusCode < 400) {
-        // do something with response.body
-      } else {
-        // bad/unexpected status code, delegate error
-      }
-    })
-    .catch((err) => {
-      // handle/delegate err
-    })
+api
+  .getAsync(uri)
+  .then(response => {
+    if (response.statusCode >= 200 && response.statusCode < 400) {
+      // do something with response.body
+    } else {
+      // bad/unexpected status code, delegate error
+    }
+  })
+  .catch(err => {
+    // handle/delegate err
+  });
 
 // or callback
 api.get(uri, (err, response, body) => {
   if (err) {
     // handle/delegate err
-    return
+    return;
   }
 
   if (response.statusCode >= 200 && response.statusCode < 400) {
@@ -141,7 +144,7 @@ api.get(uri, (err, response, body) => {
   } else {
     // bad/unexpected status code, delegate error
   }
-})
+});
 ```
 
 ### HTTP Request Methods
@@ -178,4 +181,3 @@ some functionality. For details about this, read the source code!
 
 [request]: https://www.npmjs.com/package/request
 [basicjs]: ./basic.js
-
