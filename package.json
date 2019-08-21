@@ -12,7 +12,8 @@
     "test": "mocha tests/** --exit",
     "postversion": "git push && git push --tags",
     "codecheck": "standard",
-    "codefix": "standard --fix"
+    "codefix": "standard --fix",
+    "build": "./build.sh"
   },
   "keywords": [
     "api",
