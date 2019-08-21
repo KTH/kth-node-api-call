@@ -7,6 +7,12 @@
     "type": "git",
     "url": "https://github.com/KTH/kth-node-api-call"
   },
+  "author": {
+    "name": "KTH",
+    "email": "infosys@kth.se",
+    "url": "https://github.com/KTH"
+  },
+  "license": "MIT",
   "scripts": {
     "preversion": "npm run codecheck && npm run test",
     "test": "mocha tests/** --exit",
