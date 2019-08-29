@@ -3,6 +3,8 @@
 const BasicAPI = require("./basic");
 const urlJoin = require("url-join");
 
+const NAME = "kth-node-api-call";
+
 // default logger if none is provided in the opts object to _setup
 const defaultLog = {};
 defaultLog.error = defaultLog.info = defaultLog.debug = defaultLog.warn =
@@ -16,7 +18,7 @@ module.exports = {
 // populate an object with all api configurations and paths
 function setup(apisConfig, apisKeyConfig, opts) {
   if (!apisConfig || typeof apisConfig !== "object") {
-    throw new Error("Apis config is required.");
+    throw new Error(`${NAME} Apis config is required.`);
   }
   if (!apisKeyConfig) apisKeyConfig = {};
   if (!opts) opts = {};
@@ -51,10 +53,10 @@ function setup(apisConfig, apisKeyConfig, opts) {
           output[connectedApi.key] = connectedApi;
         }
       });
-      opts.log.info("API setup done." + JSON.stringify(connectedApis));
+      opts.log.info(`${NAME} API setup done. ${JSON.stringify(connectedApis)}`);
     })
     .catch(err => {
-      opts.log.error(`API setup failed: ${err.stack} `);
+      opts.log.error(`${NAME} API setup failed: ${err.stack} `);
       process.exit(1);
     });
 
@@ -73,28 +75,28 @@ function checkAPI(api, log) {
     .then(res => {
       if (config.useApiKey !== false) {
         if (res.statusCode === 401) {
-          throw new Error(`Bad API key for ${apiName}`);
+          throw new Error(`${NAME} Bad API key for ${apiName}`);
         } else if (res.statusCode === 404) {
           throw new Error(
-            `Check API functionality not implemented on ${apiName}`
+            `${NAME} Check API functionality not implemented on ${apiName}`
           );
         } else if (res.statusCode === 500) {
           throw new Error(
-            `Got 500 response on checkAPI call, most likely a bad API key for  ${apiName}`
+            `${NAME} Got 500 response on checkAPI call, most likely a bad API key for  ${apiName}`
           );
         }
       } else {
         if (res.statusCode < 200 || res.statusCode >= 300) {
           throw new Error(
-            `API check failed for ${apiName}, got status ${res.statusCode}`
+            `${NAME} API check failed for ${apiName}, got status ${res.statusCode}`
           );
         }
       }
     })
     .catch(err => {
-      log.error(`Error while checking API: ${err.message}`);
+      log.error(`${NAME} Error while checking API: ${err.message}`);
       if (config.required) {
-        log.error("Required API call failed, EXITING");
+        log.error(`${NAME} Required API call failed, EXITING`);
         process.exit(1);
       }
     });
@@ -118,7 +120,7 @@ function createApis(apisConfig, apisKeyConfig, apiOpts) {
 
     if (apiConfig.useApiKey !== false) {
       const k = apisKeyConfig[key];
-      if (!k) throw new Error(`nodeApi ${key} has no api key set.`);
+      if (!k) throw new Error(`${NAME} nodeApi ${key} has no api key set.`);
 
       opts.headers["api_key"] = apisKeyConfig[key];
     }
@@ -164,19 +166,14 @@ function connect(api, opts) {
       if (data.statusCode === 200) {
         api.paths = data.body.api;
         api.connected = true;
-        opts.log.info("Connected to api: " + api.key);
+        opts.log.info(`${NAME} Connected to api: ${api.key}`);
         return api;
       } else {
         opts.log.warn(
-          data.statusCode +
-            " We had problems accessing " +
-            api.key +
-            ". Check path and keys if this issue persists. We will retry in " +
-            opts.timeout +
-            "ms"
+          `${NAME} ${data.statusCode} We had problems accessing ${api.key} . Check path and keys if this issue persists. We will retry in ${opts.timeout}ms`
         );
         setTimeout(function() {
-          opts.log.info("Reconnecting to api: " + api.key);
+          opts.log.info(`${NAME} Reconnecting to api: ${api.key}`);
           connect(
             api,
             opts
@@ -188,15 +185,10 @@ function connect(api, opts) {
     .catch(err => {
       opts.log.error(
         { err: err },
-        "Failed to get API paths from API: ",
-        api.key,
-        "host: ",
-        api.config.host,
-        " proxyBasePath: ",
-        api.config.proxyBasePath
+        `${NAME} Failed to get API paths from API: ${api.key}, host: ${api.config.host}, proxyBasePath:  ${api.config.proxyBasePath}.`
       );
       setTimeout(function() {
-        opts.log.info("Reconnecting to api: " + api.key);
+        opts.log.info(`${NAME} Reconnecting to api: ${api.key}`);
         connect(
           api,
           opts
