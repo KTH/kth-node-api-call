@@ -56,16 +56,20 @@ function BasicAPI(options, base) {
   this._log = options.log;
 }
 
-const hasESOCKETTIMEDOUT = e => {
+/**
+ * ESOCKETTIMEDOUT or ETIMEDOUT errors return true.
+ * @param {*} e
+ */
+const isTimeoutError = e => {
   if (typeof e === "object") {
     const keys = Object.getOwnPropertyNames(e);
     for (let i = 0; i < keys.length; i++) {
-      if (e[keys[i]] && e[keys[i]].toString().includes("ESOCKETTIMEDOUT")) {
+      if (e[keys[i]] && e[keys[i]].toString().includes("TIMEDOUT")) {
         return true;
       }
     }
   } else {
-    return e.includes("ESOCKETTIMEDOUT");
+    return e.includes("TIMEDOUT");
   }
 };
 
@@ -73,7 +77,7 @@ const retryWrapper = (_this, cb, args) => {
   let counter = 0;
   const sendRequest = () => {
     return cb.apply(_this, args).catch(e => {
-      if (hasESOCKETTIMEDOUT(e) && counter < _this._maxNumberOfRetries) {
+      if (isTimeoutError(e) && counter < _this._maxNumberOfRetries) {
         counter++;
         _this._log.warn(
           `Request to "${args[2]}" failed, Retry ${counter}/${
@@ -81,9 +85,9 @@ const retryWrapper = (_this, cb, args) => {
           }`
         );
         return sendRequest();
-      } else if (hasESOCKETTIMEDOUT(e)) {
+      } else if (isTimeoutError(e)) {
         throw new Error(
-          `ESOCKETTIMEDOUT, The request failed after ${counter} retries. The connection to the API seems to be overloaded.`
+          `The request timed out after ${counter} retries. The connection to the API seems to be overloaded.`
         );
       } else {
         throw e;

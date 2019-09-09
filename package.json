@@ -1,6 +1,6 @@
 {
   "name": "kth-node-api-call",
-  "version": "2.0.5",
+  "version": "3.0.0",
   "description": "Node.js module to make JSON calls against APIs.",
   "main": "index.js",
   "repository": {
@@ -14,11 +14,9 @@
   },
   "license": "MIT",
   "scripts": {
-    "preversion": "npm run codecheck && npm run test",
+    "preversion": "npm test",
     "test": "mocha tests/** --exit",
     "postversion": "git push && git push --tags",
-    "codecheck": "standard",
-    "codefix": "standard --fix",
     "build": "./build.sh"
   },
   "keywords": [
@@ -27,21 +25,15 @@
     "json"
   ],
   "dependencies": {
-    "q": "^1.4.1",
+    "q": "^1.5.1",
     "request": "^2.88.0",
-    "url-join": "^2.0.2"
+    "url-join": "^4.0.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^5.2.0",
-    "nock": "^10.0.0",
-    "redis-mock": "^0.16.0",
-    "sinon": "^2.1.0",
-    "standard": "^12.0.1"
-  },
-  "standard": {
-    "ignore": [
-      "tests/test.js"
-    ]
+    "mocha": "^6.2.0",
+    "nock": "^11.3.1",
+    "redis-mock": "^0.46.0",
+    "sinon": "^7.4.2"
   }
 }
