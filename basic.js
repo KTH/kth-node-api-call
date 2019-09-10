@@ -76,8 +76,9 @@ const retryWrapper = (_this, cb, args) => {
     return cb.apply(_this, args).catch(e => {
       if (isTimeoutError(e) && counter < _this._maxNumberOfRetries) {
         counter++;
+        const url = typeof args[2] === 'object' ? args[2].uri : args[2]
         _this._log.warn(
-          `Request to "${args[2]}" failed, Retry ${counter}/${
+          `Request to "${url}" failed, Retry ${counter}/${
             _this._maxNumberOfRetries
           }`
         );
