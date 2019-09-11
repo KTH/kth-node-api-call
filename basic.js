@@ -39,7 +39,8 @@ function BasicAPI(options, base) {
   const opts = {
     baseUrl: _toBaseUrl(options),
     headers: options.headers,
-    json: options.json
+    json: options.json,
+    pool: { maxSockets: Infinity }
   };
 
   this._request = request.defaults(opts);
@@ -61,7 +62,7 @@ function BasicAPI(options, base) {
  * @param {*} e
  */
 const isTimeoutError = e => {
-  if (e.name === 'Error') {
+  if (e.name === "Error") {
     return e.toString().includes("TIMEDOUT");
   } else if (typeof e === "object") {
     return JSON.stringify(e).includes("TIMEDOUT");
@@ -76,11 +77,9 @@ const retryWrapper = (_this, cb, args) => {
     return cb.apply(_this, args).catch(e => {
       if (isTimeoutError(e) && counter < _this._maxNumberOfRetries) {
         counter++;
-        const url = typeof args[2] === 'object' ? args[2].uri : args[2]
+        const url = typeof args[2] === "object" ? args[2].uri : args[2];
         _this._log.warn(
-          `Request to "${url}" failed, Retry ${counter}/${
-            _this._maxNumberOfRetries
-          }`
+          `Request to "${url}" failed, Retry ${counter}/${_this._maxNumberOfRetries}`
         );
         return sendRequest();
       } else if (isTimeoutError(e)) {
