@@ -1,4 +1,5 @@
-# KTH Node API Call
+# KTH Node API Call [![Build Status](https://travis-ci.org/kth/kth-node-api-call.svg?branch=master)](https://travis-ci.org/kth/kth-node-monitor)
+
 
 # Overview
 
