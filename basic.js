@@ -61,16 +61,13 @@ function BasicAPI(options, base) {
  * @param {*} e
  */
 const isTimeoutError = e => {
-  if (typeof e === "object") {
-    const keys = Object.getOwnPropertyNames(e);
-    for (let i = 0; i < keys.length; i++) {
-      if (e[keys[i]] && e[keys[i]].toString().includes("TIMEDOUT")) {
-        return true;
-      }
-    }
-  } else {
-    return e.includes("TIMEDOUT");
+  if (e.name === 'Error') {
+    return e.toString().includes("TIMEDOUT");
+  } else if (typeof e === "object") {
+    return JSON.stringify(e).includes("TIMEDOUT");
   }
+
+  return e.toString().includes("TIMEDOUT");
 };
 
 const retryWrapper = (_this, cb, args) => {
@@ -79,8 +76,9 @@ const retryWrapper = (_this, cb, args) => {
     return cb.apply(_this, args).catch(e => {
       if (isTimeoutError(e) && counter < _this._maxNumberOfRetries) {
         counter++;
+        const url = typeof args[2] === 'object' ? args[2].uri : args[2]
         _this._log.warn(
-          `Request to "${args[2]}" failed, Retry ${counter}/${
+          `Request to "${url}" failed, Retry ${counter}/${
             _this._maxNumberOfRetries
           }`
         );
