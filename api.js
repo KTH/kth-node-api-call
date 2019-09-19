@@ -33,6 +33,7 @@ module.exports = (function() {
    *  https : boolean / default: true
    *  headers : object / default: undefined
    *  json : boolean / default: false
+   *  encoding : string / default: 'utf8'
    * }
    * @constructor
    */
@@ -49,7 +50,8 @@ module.exports = (function() {
       method: options.method,
       json: options.json,
       body: JSON.stringify(options.data),
-      headers: options.headers
+      headers: options.headers,
+      encoding: options.encoding
     };
 
     this.debugPrint = function(msg) {
@@ -178,6 +180,7 @@ module.exports = (function() {
     options.headers = requestOptions.headers || {};
     options.json = requestOptions.json || true;
     options.qsOptions = requestOptions.qsOptions || { arrayFormat: "brackets" };
+    options.encoding = requestOptions.encoding || "utf8";
 
     if (typeof requestOptions.https === "undefined" || requestOptions.https) {
       options.https = true;
