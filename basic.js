@@ -78,9 +78,11 @@ const retryWrapper = (_this, cb, args) => {
       if (isTimeoutError(e) && counter < _this._maxNumberOfRetries) {
         counter++;
         const url = typeof args[2] === "object" ? args[2].uri : args[2];
-        _this._log.warn(
-          `Request to "${url}" failed, Retry ${counter}/${_this._maxNumberOfRetries}`
-        );
+        if (_this._log) {
+          _this._log.warn(
+            `Request to "${url}" failed, Retry ${counter}/${_this._maxNumberOfRetries}`
+          );
+        }
         return sendRequest();
       } else if (isTimeoutError(e)) {
         throw new Error(
