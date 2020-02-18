@@ -170,27 +170,27 @@ describe("Testing api", function() {
       const client = output.testApi.client;
       client.getAsync("/api/test/error").catch(e => {
         expect(e.message).to.equal(
-          "The request timed out after 5 retries. The connection to the API seems to be overloaded."
+          "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
         );
         client.putAsync("/api/test/error").catch(e => {
           expect(e.message).to.equal(
-            "The request timed out after 5 retries. The connection to the API seems to be overloaded."
+            "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
           );
           client.postAsync("/api/test/error").catch(e => {
             expect(e.message).to.equal(
-              "The request timed out after 5 retries. The connection to the API seems to be overloaded."
+              "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
             );
             client.delAsync("/api/test/error").catch(e => {
               expect(e.message).to.equal(
-                "The request timed out after 5 retries. The connection to the API seems to be overloaded."
+                "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
               );
               client.patchAsync("/api/test/error").catch(e => {
                 expect(e.message).to.equal(
-                  "The request timed out after 5 retries. The connection to the API seems to be overloaded."
+                  "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
                 );
                 client.headAsync("/api/test/error").catch(e => {
                   expect(e.message).to.equal(
-                    "The request timed out after 5 retries. The connection to the API seems to be overloaded."
+                    "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
                   );
                   done();
                 });
@@ -247,27 +247,27 @@ describe("Testing api", function() {
       const client = output.testApi.client;
       client.getAsync("/api/test/error").catch(e => {
         expect(e.message).to.equal(
-          "The request timed out after 5 retries. The connection to the API seems to be overloaded."
+          "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
         );
         client.putAsync("/api/test/error").catch(e => {
           expect(e.message).to.equal(
-            "The request timed out after 5 retries. The connection to the API seems to be overloaded."
+            "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
           );
           client.postAsync("/api/test/error").catch(e => {
             expect(e.message).to.equal(
-              "The request timed out after 5 retries. The connection to the API seems to be overloaded."
+              "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
             );
             client.delAsync("/api/test/error").catch(e => {
               expect(e.message).to.equal(
-                "The request timed out after 5 retries. The connection to the API seems to be overloaded."
+                "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
               );
               client.patchAsync("/api/test/error").catch(e => {
                 expect(e.message).to.equal(
-                  "The request timed out after 5 retries. The connection to the API seems to be overloaded."
+                  "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
                 );
                 client.headAsync("/api/test/error").catch(e => {
                   expect(e.message).to.equal(
-                    "The request timed out after 5 retries. The connection to the API seems to be overloaded."
+                    "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
                   );
                   done();
                 });
@@ -324,27 +324,27 @@ describe("Testing api", function() {
       const client = output.testApi.client;
       client.getAsync("/api/test/error").catch(e => {
         expect(e.message).to.equal(
-          "The request timed out after 10 retries. The connection to the API seems to be overloaded."
+          "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
         );
         client.putAsync("/api/test/error").catch(e => {
           expect(e.message).to.equal(
-            "The request timed out after 10 retries. The connection to the API seems to be overloaded."
+            "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
           );
           client.postAsync("/api/test/error").catch(e => {
             expect(e.message).to.equal(
-              "The request timed out after 10 retries. The connection to the API seems to be overloaded."
+              "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
             );
             client.delAsync("/api/test/error").catch(e => {
               expect(e.message).to.equal(
-                "The request timed out after 10 retries. The connection to the API seems to be overloaded."
+                "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
               );
               client.patchAsync("/api/test/error").catch(e => {
                 expect(e.message).to.equal(
-                  "The request timed out after 10 retries. The connection to the API seems to be overloaded."
+                  "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
                 );
                 client.headAsync("/api/test/error").catch(e => {
                   expect(e.message).to.equal(
-                    "The request timed out after 10 retries. The connection to the API seems to be overloaded."
+                    "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
                   );
                   done();
                 });
@@ -401,27 +401,27 @@ describe("Testing api", function() {
       const client = output.testApi.client;
       client.getAsync("/api/test/error").catch(e => {
         expect(e.message).to.equal(
-          "The request timed out after 10 retries. The connection to the API seems to be overloaded."
+          "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
         );
         client.putAsync("/api/test/error").catch(e => {
           expect(e.message).to.equal(
-            "The request timed out after 10 retries. The connection to the API seems to be overloaded."
+            "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
           );
           client.postAsync("/api/test/error").catch(e => {
             expect(e.message).to.equal(
-              "The request timed out after 10 retries. The connection to the API seems to be overloaded."
+              "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
             );
             client.delAsync("/api/test/error").catch(e => {
               expect(e.message).to.equal(
-                "The request timed out after 10 retries. The connection to the API seems to be overloaded."
+                "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
               );
               client.patchAsync("/api/test/error").catch(e => {
                 expect(e.message).to.equal(
-                  "The request timed out after 10 retries. The connection to the API seems to be overloaded."
+                  "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
                 );
                 client.headAsync("/api/test/error").catch(e => {
                   expect(e.message).to.equal(
-                    "The request timed out after 10 retries. The connection to the API seems to be overloaded."
+                    "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
                   );
                   done();
                 });
