@@ -3,6 +3,7 @@
 const request = require("request");
 const querystring = require("querystring");
 const url = require("url");
+const uuidv1 = require("uuid/v1");
 
 /**
  * Creates a wrapper around request with useful defaults.
@@ -28,11 +29,17 @@ function BasicAPI(options, base) {
   }
 
   options = options || {};
+  if (!options.headers) {
+    options.headers = {};
+  }
+  const guid = uuidv1();
+  options.headers["request-guid"] = guid;
 
   if (base) {
     this._request = base._request.defaults(options);
     this._redis = base._redis;
     this._hasRedis = base._hasRedis;
+    this._guid = guid;
     return;
   }
 
@@ -55,6 +62,7 @@ function BasicAPI(options, base) {
     ? options.maxNumberOfRetries
     : 5;
   this._log = options.log;
+  this._guid = guid;
 }
 
 /**
@@ -73,6 +81,9 @@ const isTimeoutError = e => {
 
 const retryWrapper = (_this, cb, args) => {
   let counter = 0;
+  _this._log.debug(
+    `Request with guid ${this._guid} to "${url}" , Retry ${counter}/${_this._maxNumberOfRetries}`
+  );
   const sendRequest = () => {
     return cb.apply(_this, args).catch(e => {
       if (isTimeoutError(e) && counter < _this._maxNumberOfRetries) {
@@ -80,13 +91,13 @@ const retryWrapper = (_this, cb, args) => {
         const url = typeof args[2] === "object" ? args[2].uri : args[2];
         if (_this._log) {
           _this._log.warn(
-            `Request to "${url}" failed, Retry ${counter}/${_this._maxNumberOfRetries}`
+            `Request with guid ${this._guid} to "${url}" failed, Retry ${counter}/${_this._maxNumberOfRetries}`
           );
         }
         return sendRequest();
       } else if (isTimeoutError(e)) {
         throw new Error(
-          `The request timed out after ${counter} retries. The connection to the API seems to be overloaded.`
+          `The request with guid ${this._guid} timed out after ${counter} retries. The connection to the API seems to be overloaded.`
         );
       } else {
         throw e;

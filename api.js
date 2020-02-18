@@ -6,6 +6,7 @@
 // Load the request module
 var httpRequest = require("request");
 var Q = require("q");
+const uuidv1 = require("uuid/v1");
 
 module.exports = (function() {
   var MIME_JSON = "application/json";
@@ -248,6 +249,8 @@ module.exports = (function() {
         normalizedHeaders[name.toLowerCase()] = headers[name];
       }
     }
+    normalizedHeaders["request-guid"] = uuidv1(); // ⇨ '2c5ea4c0-4067-11e9-8bad-9b1deb4d3b7d'
+
     return normalizedHeaders;
   }
 
