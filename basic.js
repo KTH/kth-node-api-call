@@ -4,7 +4,7 @@ const request = require("request");
 const querystring = require("querystring");
 const url = require("url");
 const uuidv1 = require("uuid/v1");
-
+const REQUEST_GUID = "request-guid";
 /**
  * Creates a wrapper around request with useful defaults.
  * @param {object} [options] - plain js object with options
@@ -32,14 +32,11 @@ function BasicAPI(options, base) {
   if (!options.headers) {
     options.headers = {};
   }
-  const guid = uuidv1();
-  options.headers["request-guid"] = guid;
 
   if (base) {
     this._request = base._request.defaults(options);
     this._redis = base._redis;
     this._hasRedis = base._hasRedis;
-    this._guid = guid;
     return;
   }
 
@@ -47,7 +44,7 @@ function BasicAPI(options, base) {
     baseUrl: _toBaseUrl(options),
     headers: options.headers,
     json: options.json,
-    pool: { maxSockets: Infinity }
+    pool: { maxSockets: Infinity },
   };
 
   this._request = request.defaults(opts);
@@ -55,14 +52,9 @@ function BasicAPI(options, base) {
   this._hasRedis = !!(this._redis && this._redis.client);
   this._basePath = options.basePath || "";
   this._defaultTimeout = options.defaultTimeout || 2000;
-  this._retryOnESOCKETTIMEDOUT = options.retryOnESOCKETTIMEDOUT
-    ? options.retryOnESOCKETTIMEDOUT
-    : undefined;
-  this._maxNumberOfRetries = options.maxNumberOfRetries
-    ? options.maxNumberOfRetries
-    : 5;
+  this._retryOnESOCKETTIMEDOUT = options.retryOnESOCKETTIMEDOUT ? options.retryOnESOCKETTIMEDOUT : undefined;
+  this._maxNumberOfRetries = options.maxNumberOfRetries ? options.maxNumberOfRetries : 5;
   this._log = options.log;
-  this._guid = guid;
 }
 
 /**
@@ -81,9 +73,10 @@ const isTimeoutError = e => {
 
 const retryWrapper = (_this, cb, args) => {
   let counter = 0;
-  _this._log.debug(
-    `Request with guid ${this._guid} to "${url}" , Retry ${counter}/${_this._maxNumberOfRetries}`
-  );
+  const requestGuid = typeof args[2] === "object" ? args[2].requestGuid : undefined;
+  if (_this._log) {
+    _this._log.debug(`Request retryWrapper ${JSON.stringify(args)}`);
+  }
   const sendRequest = () => {
     return cb.apply(_this, args).catch(e => {
       if (isTimeoutError(e) && counter < _this._maxNumberOfRetries) {
@@ -91,13 +84,13 @@ const retryWrapper = (_this, cb, args) => {
         const url = typeof args[2] === "object" ? args[2].uri : args[2];
         if (_this._log) {
           _this._log.warn(
-            `Request with guid ${this._guid} to "${url}" failed, Retry ${counter}/${_this._maxNumberOfRetries}`
+            `Request with guid ${_this.lastRequestGuid} to "${url}" failed, Retry ${counter}/${_this._maxNumberOfRetries}`
           );
         }
         return sendRequest();
       } else if (isTimeoutError(e)) {
         throw new Error(
-          `The request with guid ${this._guid} timed out after ${counter} retries. The connection to the API seems to be overloaded.`
+          `The request with guid ${_this.lastRequestGuid} timed out after ${counter} retries. The connection to the API seems to be overloaded.`
         );
       } else {
         throw e;
@@ -323,10 +316,7 @@ function _wrapCallback(api, options, method, callback) {
       const key = _getKey(api, options, method);
       const value = JSON.stringify(res);
 
-      const redisMaybeFnc =
-        typeof api._redis.client === "function"
-          ? api._redis.client()
-          : api._redis.client;
+      const redisMaybeFnc = typeof api._redis.client === "function" ? api._redis.client() : api._redis.client;
 
       Promise.resolve(redisMaybeFnc)
         .then(client => {
@@ -352,10 +342,7 @@ function _exec(api, options, method, callback) {
   if (api._hasRedis && options.useCache) {
     const key = _getKey(api, options, method);
 
-    const redisMaybeFnc =
-      typeof api._redis.client === "function"
-        ? api._redis.client()
-        : api._redis.client;
+    const redisMaybeFnc = typeof api._redis.client === "function" ? api._redis.client() : api._redis.client;
 
     Promise.resolve(redisMaybeFnc)
       .then(client => {
@@ -385,12 +372,18 @@ function _makeRequest(api, options, method, callback) {
 
   if (typeof options === "string") {
     options = {
-      uri: uri
+      uri: uri,
+      requestGuid: uuidv1(),
     };
   } else {
     options.uri = uri;
+    options.requestGuid = options.requestGuid || uuidv1();
   }
-
+  if (!options.headers) {
+    options.headers = {};
+  }
+  options.headers[REQUEST_GUID] = options.requestGuid;
+  api.lastRequestGuid = options.requestGuid;
   callback = _wrapCallback(api, options, method, callback);
   return api._request[method](options, callback);
 }
@@ -421,7 +414,7 @@ function _createPromiseCallback(resolve, reject) {
         statusCode: response.statusCode,
         statusMessage: response.statusMessage,
         headers: response.headers,
-        body: body
+        body: body,
       });
     }
   };
@@ -444,14 +437,14 @@ function _toBaseUrl(parts) {
   if (!port) {
     return url.format({
       protocol: protocol,
-      host: host
+      host: host,
     });
   }
 
   return url.format({
     protocol: protocol,
     hostname: host,
-    port: port
+    port: port,
   });
 }
 

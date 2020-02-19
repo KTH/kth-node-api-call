@@ -12,6 +12,7 @@ module.exports = (function() {
   var MIME_JSON = "application/json";
   var MIME_TEXT = "text/plain";
   var HEADER_ACCEPT = "accept";
+  var REQUEST_GUID = "request-guid";
 
   /**
    * Wrap our constructor in a factory method.
@@ -52,7 +53,7 @@ module.exports = (function() {
       json: options.json,
       body: JSON.stringify(options.data),
       headers: options.headers,
-      encoding: options.encoding
+      encoding: options.encoding,
     };
 
     this.debugPrint = function(msg) {
@@ -72,6 +73,7 @@ module.exports = (function() {
   Api.prototype.getJson = function(onSuccess, onError) {
     var self = this;
     self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_JSON;
+    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuid();
     self.httpRequestSettings.method = "GET";
 
     self.request(onSuccess, onError);
@@ -87,6 +89,7 @@ module.exports = (function() {
     var self = this;
     self.json = false;
     self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_TEXT;
+    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuid();
     self.httpRequestSettings.method = "GET";
 
     self.request(onSuccess, onError);
@@ -104,6 +107,7 @@ module.exports = (function() {
     self.httpRequestSettings.json = true;
     self.httpRequestSettings.method = "POST";
     self.httpRequestSettings.body = data;
+    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuid();
 
     self.request(onSuccess, onError);
   };
@@ -117,15 +121,10 @@ module.exports = (function() {
   Api.prototype.request = function(onSuccess, onError) {
     var self = this;
 
-    self.debugPrint(
-      "GET Request settings: " + JSON.stringify(self.httpRequestSettings)
-    );
+    self.debugPrint("GET Request settings: " + JSON.stringify(self.httpRequestSettings));
 
     // handle response, i.e. call correct callback
-    httpRequest(
-      self.httpRequestSettings,
-      handleResponse(self, onSuccess, onError)
-    );
+    httpRequest(self.httpRequestSettings, handleResponse(self, onSuccess, onError));
   };
 
   /**
@@ -135,6 +134,7 @@ module.exports = (function() {
     var self = this;
     self.json = false;
     self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_TEXT;
+    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuid();
     self.httpRequestSettings.method = "GET";
 
     return self.promisedApiCall();
@@ -152,9 +152,7 @@ module.exports = (function() {
 
     var deferred = Q.defer();
 
-    self.debugPrint(
-      "Deferred call: " + JSON.stringify(self.httpRequestSettings)
-    );
+    self.debugPrint("Deferred call: " + JSON.stringify(self.httpRequestSettings));
 
     self.request(
       function(data) {
@@ -209,7 +207,7 @@ module.exports = (function() {
         if (response.statusCode >= 400) {
           return onError({
             statusCode: response.statusCode,
-            body: response.body
+            body: response.body,
           });
         }
         onSuccess(body);
@@ -249,7 +247,6 @@ module.exports = (function() {
         normalizedHeaders[name.toLowerCase()] = headers[name];
       }
     }
-    normalizedHeaders["request-guid"] = uuidv1(); // ⇨ '2c5ea4c0-4067-11e9-8bad-9b1deb4d3b7d'
 
     return normalizedHeaders;
   }

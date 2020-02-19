@@ -19,12 +19,12 @@ const mockApiConfig = {
     port: 3001,
     host: "localhost",
     proxyBasePath: "/api/test",
-    required: true
-  }
+    required: true,
+  },
 };
 
 const mockApiKeyConfig = {
-  testApi: "1234"
+  testApi: "1234",
 };
 const mockLogger = {};
 mockLogger.debug = mockLogger.error = mockLogger.warn = mockLogger.info = () => {};
@@ -37,9 +37,9 @@ const opts = {
   },
   timeout: 100,
   cache: {
-    testApi: mockApiConfig
+    testApi: mockApiConfig,
   },
-  checkAPIs: true // performs api-key checks against the apis, if a 'required' check fails, the app will exit. Required apis are specified in the config
+  checkAPIs: true, // performs api-key checks against the apis, if a 'required' check fails, the app will exit. Required apis are specified in the config
 };
 
 const optsRetry = {
@@ -49,10 +49,10 @@ const optsRetry = {
   },
   timeout: 100,
   cache: {
-    testApi: mockApiConfig
+    testApi: mockApiConfig,
   },
   checkAPIs: true,
-  retryOnESOCKETTIMEDOUT: true
+  retryOnESOCKETTIMEDOUT: true,
 };
 
 const connections = require("../connections");
@@ -62,8 +62,9 @@ describe("Testing api", function() {
     this.originalProcess = process.exit;
     Object.defineProperty(process, "exit", {
       // mocking out process globally
-      value: sinon.spy()
+      value: sinon.spy(),
     });
+
     const output = connections.setup(mockApiConfig, mockApiKeyConfig, opts);
     setTimeout(function() {
       expect(process.exit.called).to.be.true;
@@ -74,8 +75,9 @@ describe("Testing api", function() {
   it("should set up connections", function(done) {
     Object.defineProperty(process, "exit", {
       // undo previous exit override
-      value: this.originalProcess
+      value: this.originalProcess,
     });
+
     mockAPI
       .get("/api/test/_paths")
       .reply(200, {
@@ -85,9 +87,9 @@ describe("Testing api", function() {
           apikey: {
             scope_required: true,
             scopes: ["read"],
-            type: "api_key"
-          }
-        }
+            type: "api_key",
+          },
+        },
       })
       .get("/api/test/_checkAPIkey")
       .reply(200, {});
@@ -102,7 +104,7 @@ describe("Testing api", function() {
     mockAPI
       .get("/api/test/_paths")
       .reply(503, {
-        message: "Service Unavailable"
+        message: "Service Unavailable",
       })
       .get("/api/test/_paths")
       .reply(200, {
@@ -112,9 +114,9 @@ describe("Testing api", function() {
           apikey: {
             scope_required: true,
             scopes: ["read"],
-            type: "api_key"
-          }
-        }
+            type: "api_key",
+          },
+        },
       })
       .get("/api/test/_checkAPIkey")
       .reply(200, {});
@@ -135,9 +137,9 @@ describe("Testing api", function() {
           apikey: {
             scope_required: true,
             scopes: ["read"],
-            type: "api_key"
-          }
-        }
+            type: "api_key",
+          },
+        },
       })
       .get("/api/test/_checkAPIkey")
       .reply(200, {})
@@ -160,38 +162,26 @@ describe("Testing api", function() {
       .times(6)
       .replyWithError("ESOCKETTIMEDOUT");
 
-    const output = connections.setup(
-      mockApiConfig,
-      mockApiKeyConfig,
-      optsRetry
-    );
+    const output = connections.setup(mockApiConfig, mockApiKeyConfig, optsRetry);
 
     setTimeout(function() {
       const client = output.testApi.client;
       client.getAsync("/api/test/error").catch(e => {
-        expect(e.message).to.equal(
-          "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
-        );
+        expect(e.message).to.contains("timed out after 5 retries. The connection to the API seems to be overloaded.");
         client.putAsync("/api/test/error").catch(e => {
-          expect(e.message).to.equal(
-            "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
-          );
+          expect(e.message).to.contains("timed out after 5 retries. The connection to the API seems to be overloaded.");
           client.postAsync("/api/test/error").catch(e => {
-            expect(e.message).to.equal(
-              "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
-            );
+            expect(e.message).to.contains("timed out after 5 retries. The connection to the API seems to be overloaded.");
+
             client.delAsync("/api/test/error").catch(e => {
-              expect(e.message).to.equal(
-                "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
-              );
+              expect(e.message).to.contains("timed out after 5 retries. The connection to the API seems to be overloaded.");
+
               client.patchAsync("/api/test/error").catch(e => {
-                expect(e.message).to.equal(
-                  "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
-                );
+                expect(e.message).to.contains("timed out after 5 retries. The connection to the API seems to be overloaded.");
+
                 client.headAsync("/api/test/error").catch(e => {
-                  expect(e.message).to.equal(
-                    "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
-                  );
+                  expect(e.message).to.contains("timed out after 5 retries. The connection to the API seems to be overloaded.");
+
                   done();
                 });
               });
@@ -212,9 +202,9 @@ describe("Testing api", function() {
           apikey: {
             scope_required: true,
             scopes: ["read"],
-            type: "api_key"
-          }
-        }
+            type: "api_key",
+          },
+        },
       })
       .get("/api/test/_checkAPIkey")
       .reply(200, {})
@@ -237,38 +227,28 @@ describe("Testing api", function() {
       .times(6)
       .replyWithError("ETIMEDOUT");
 
-    const output = connections.setup(
-      mockApiConfig,
-      mockApiKeyConfig,
-      optsRetry
-    );
+    const output = connections.setup(mockApiConfig, mockApiKeyConfig, optsRetry);
 
     setTimeout(function() {
       const client = output.testApi.client;
       client.getAsync("/api/test/error").catch(e => {
-        expect(e.message).to.equal(
-          "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
-        );
+        expect(e.message).to.contains("timed out after 5 retries. The connection to the API seems to be overloaded.");
+
         client.putAsync("/api/test/error").catch(e => {
-          expect(e.message).to.equal(
-            "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
-          );
+          expect(e.message).to.contains("timed out after 5 retries. The connection to the API seems to be overloaded.");
+
           client.postAsync("/api/test/error").catch(e => {
-            expect(e.message).to.equal(
-              "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
-            );
+            expect(e.message).to.contains("timed out after 5 retries. The connection to the API seems to be overloaded.");
+
             client.delAsync("/api/test/error").catch(e => {
-              expect(e.message).to.equal(
-                "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
-              );
+              expect(e.message).to.contains("timed out after 5 retries. The connection to the API seems to be overloaded.");
+
               client.patchAsync("/api/test/error").catch(e => {
-                expect(e.message).to.equal(
-                  "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
-                );
+                expect(e.message).to.contains("timed out after 5 retries. The connection to the API seems to be overloaded.");
+
                 client.headAsync("/api/test/error").catch(e => {
-                  expect(e.message).to.equal(
-                    "The request with guid undefined timed out after 5 retries. The connection to the API seems to be overloaded."
-                  );
+                  expect(e.message).to.contains("timed out after 5 retries. The connection to the API seems to be overloaded.");
+
                   done();
                 });
               });
@@ -289,9 +269,9 @@ describe("Testing api", function() {
           apikey: {
             scope_required: true,
             scopes: ["read"],
-            type: "api_key"
-          }
-        }
+            type: "api_key",
+          },
+        },
       })
       .get("/api/test/_checkAPIkey")
       .reply(200, {})
@@ -314,38 +294,28 @@ describe("Testing api", function() {
       .times(11)
       .replyWithError("ESOCKETTIMEDOUT");
 
-    const output = connections.setup(
-      mockApiConfig,
-      mockApiKeyConfig,
-      Object.assign(optsRetry, { maxNumberOfRetries: 10 })
-    );
+    const output = connections.setup(mockApiConfig, mockApiKeyConfig, Object.assign(optsRetry, { maxNumberOfRetries: 10 }));
 
     setTimeout(function() {
       const client = output.testApi.client;
       client.getAsync("/api/test/error").catch(e => {
-        expect(e.message).to.equal(
-          "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
-        );
+        expect(e.message).to.contains("timed out after 10 retries. The connection to the API seems to be overloaded.");
+
         client.putAsync("/api/test/error").catch(e => {
-          expect(e.message).to.equal(
-            "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
-          );
+          expect(e.message).to.contains("timed out after 10 retries. The connection to the API seems to be overloaded.");
+
           client.postAsync("/api/test/error").catch(e => {
-            expect(e.message).to.equal(
-              "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
-            );
+            expect(e.message).to.contains("timed out after 10 retries. The connection to the API seems to be overloaded.");
+
             client.delAsync("/api/test/error").catch(e => {
-              expect(e.message).to.equal(
-                "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
-              );
+              expect(e.message).to.contains("timed out after 10 retries. The connection to the API seems to be overloaded.");
+
               client.patchAsync("/api/test/error").catch(e => {
-                expect(e.message).to.equal(
-                  "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
-                );
+                expect(e.message).to.contains("timed out after 10 retries. The connection to the API seems to be overloaded.");
+
                 client.headAsync("/api/test/error").catch(e => {
-                  expect(e.message).to.equal(
-                    "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
-                  );
+                  expect(e.message).to.contains("timed out after 10 retries. The connection to the API seems to be overloaded.");
+
                   done();
                 });
               });
@@ -366,9 +336,9 @@ describe("Testing api", function() {
           apikey: {
             scope_required: true,
             scopes: ["read"],
-            type: "api_key"
-          }
-        }
+            type: "api_key",
+          },
+        },
       })
       .get("/api/test/_checkAPIkey")
       .reply(200, {})
@@ -391,38 +361,28 @@ describe("Testing api", function() {
       .times(11)
       .replyWithError("ETIMEDOUT");
 
-    const output = connections.setup(
-      mockApiConfig,
-      mockApiKeyConfig,
-      Object.assign(optsRetry, { maxNumberOfRetries: 10 })
-    );
+    const output = connections.setup(mockApiConfig, mockApiKeyConfig, Object.assign(optsRetry, { maxNumberOfRetries: 10 }));
 
     setTimeout(function() {
       const client = output.testApi.client;
       client.getAsync("/api/test/error").catch(e => {
-        expect(e.message).to.equal(
-          "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
-        );
+        expect(e.message).to.contains("timed out after 10 retries. The connection to the API seems to be overloaded.");
+
         client.putAsync("/api/test/error").catch(e => {
-          expect(e.message).to.equal(
-            "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
-          );
+          expect(e.message).to.contains("timed out after 10 retries. The connection to the API seems to be overloaded.");
+
           client.postAsync("/api/test/error").catch(e => {
-            expect(e.message).to.equal(
-              "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
-            );
+            expect(e.message).to.contains("timed out after 10 retries. The connection to the API seems to be overloaded.");
+
             client.delAsync("/api/test/error").catch(e => {
-              expect(e.message).to.equal(
-                "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
-              );
+              expect(e.message).to.contains("timed out after 10 retries. The connection to the API seems to be overloaded.");
+
               client.patchAsync("/api/test/error").catch(e => {
-                expect(e.message).to.equal(
-                  "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
-                );
+                expect(e.message).to.contains("timed out after 10 retries. The connection to the API seems to be overloaded.");
+
                 client.headAsync("/api/test/error").catch(e => {
-                  expect(e.message).to.equal(
-                    "The request with guid undefined timed out after 10 retries. The connection to the API seems to be overloaded."
-                  );
+                  expect(e.message).to.contains("timed out after 10 retries. The connection to the API seems to be overloaded.");
+
                   done();
                 });
               });
@@ -443,9 +403,9 @@ describe("Testing api", function() {
           apikey: {
             scope_required: true,
             scopes: ["read"],
-            type: "api_key"
-          }
-        }
+            type: "api_key",
+          },
+        },
       })
       .get("/api/test/_checkAPIkey")
       .reply(200, {})
@@ -498,9 +458,9 @@ describe("Testing api", function() {
           apikey: {
             scope_required: true,
             scopes: ["read"],
-            type: "api_key"
-          }
-        }
+            type: "api_key",
+          },
+        },
       })
       .get("/api/test/_checkAPIkey")
       .reply(200, {})
