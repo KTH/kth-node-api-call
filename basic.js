@@ -74,18 +74,14 @@ const isTimeoutError = e => {
 const retryWrapper = (_this, cb, args) => {
   let counter = 0;
   const requestGuid = typeof args[2] === "object" ? args[2].requestGuid : undefined;
-  if (_this._log) {
-    _this._log.debug(`Request retryWrapper ${JSON.stringify(args)}`);
-  }
+
   const sendRequest = () => {
     return cb.apply(_this, args).catch(e => {
       if (isTimeoutError(e) && counter < _this._maxNumberOfRetries) {
         counter++;
         const url = typeof args[2] === "object" ? args[2].uri : args[2];
         if (_this._log) {
-          _this._log.warn(
-            `Request with guid ${_this.lastRequestGuid} to "${url}" failed, Retry ${counter}/${_this._maxNumberOfRetries}`
-          );
+          _this._log.warn(`Request with guid ${_this.lastRequestGuid} to "${url}" failed, Retry ${counter}/${_this._maxNumberOfRetries}`);
         }
         return sendRequest();
       } else if (isTimeoutError(e)) {
