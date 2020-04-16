@@ -1,6 +1,6 @@
 {
   "name": "kth-node-api-call",
-  "version": "3.0.8",
+  "version": "3.0.9",
   "description": "Node.js module to make JSON calls against APIs.",
   "main": "index.js",
   "repository": {
@@ -26,7 +26,7 @@
   ],
   "dependencies": {
     "q": "^1.5.1",
-    "request": "^2.88.0",
+    "request": "^2.88.2",
     "url-join": "^4.0.1",
     "uuid": "^3.4.0"
   },
