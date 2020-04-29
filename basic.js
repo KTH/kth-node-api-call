@@ -312,7 +312,15 @@ function _wrapCallback(api, options, method, callback) {
       const key = _getKey(api, options, method);
       const value = JSON.stringify(res);
 
-      const redisMaybeFnc = typeof api._redis.client === "function" ? api._redis.client() : api._redis.client;
+      let redisMaybeFnc = api._redis.client;
+      if (typeof api._redis.client === "function") {
+        const { clientName, clientOptions } = api._redis;
+        if (clientName == null && clientOptions == null) {
+          redisMaybeFnc = api._redis.client();
+        } else {
+          redisMaybeFnc = api._redis.client(redisClientName || "default", redisClientOptions || null);
+        }
+      }
 
       Promise.resolve(redisMaybeFnc)
         .then(client => {
