@@ -1,6 +1,6 @@
 {
   "name": "kth-node-api-call",
-  "version": "3.0.10",
+  "version": "3.0.11",
   "description": "Node.js module to make JSON calls against APIs.",
   "main": "index.js",
   "repository": {

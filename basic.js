@@ -318,7 +318,7 @@ function _wrapCallback(api, options, method, callback) {
         if (clientName == null && clientOptions == null) {
           redisMaybeFnc = api._redis.client();
         } else {
-          redisMaybeFnc = api._redis.client(redisClientName || "default", redisClientOptions || null);
+          redisMaybeFnc = api._redis.client(clientName || "default", clientOptions || null);
         }
       }
 
