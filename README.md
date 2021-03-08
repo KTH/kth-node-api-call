@@ -1,5 +1,4 @@
-# KTH Node API Call [![Build Status](https://travis-ci.org/kth/kth-node-api-call.svg?branch=master)](https://travis-ci.org/kth/kth-node-monitor)
-
+# KTH Node API Call [![Build Status](https://travis-ci.org/kth/kth-node-api-call.svg?branch=master)](https://travis-ci.org/kth/kth-node-api-call)
 
 # Overview
 
@@ -81,10 +80,9 @@ client.getAsync(client.resolve(paths.[YOUR_ENDPOINT], {user: username, etc...}))
 if you want to use a cached api, add the option `{useCache: true}` to the `getAsync` call like this:
 
 ```javascript
-client.getAsync([FULL_PATH], {useCache: true})
-.then(response => {
+client.getAsync([FULL_PATH], { useCache: true }).then((response) => {
   // etc.
-})
+});
 ```
 
 ## BasicAPI
@@ -104,8 +102,8 @@ const api = new BasicAPI({
   json: true,
   https: false,
   headers: {
-    api_key: "abcd"
-  }
+    api_key: "abcd",
+  },
   // optionally enable redis for response caching
   // redis: {
   //   client: redisClient,
@@ -122,14 +120,14 @@ const uri = api.resolve("/value/:id", params);
 // promise
 api
   .getAsync(uri)
-  .then(response => {
+  .then((response) => {
     if (response.statusCode >= 200 && response.statusCode < 400) {
       // do something with response.body
     } else {
       // bad/unexpected status code, delegate error
     }
   })
-  .catch(err => {
+  .catch((err) => {
     // handle/delegate err
   });
 
