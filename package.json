@@ -15,9 +15,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "preversion": "npm test",
     "test": "mocha tests/** --exit",
-    "postversion": "git push && git push --tags",
     "build": "./build.sh"
   },
   "keywords": [
@@ -32,17 +30,22 @@
     "uuid": "^3.4.0"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
-    "mocha": "^7.0.0",
-    "nock": "^11.7.1",
-    "redis-mock": "^0.47.0",
-    "sinon": "^8.0.4"
+    "@kth/eslint-config-kth": "^1.0.10",
+    "chai": "^4.3.4",
+    "eslint": "^7.24.0",
+    "husky": "^6.0.0",
+    "mocha": "^8.3.2",
+    "nock": "^13.0.11",
+    "prettier": "^2.2.1",
+    "pretty-quick": "^3.1.0",
+    "redis-mock": "^0.56.3",
+    "sinon": "^10.0.0"
   },
   "prettier": {
-    "trailingComma": "es5",
-    "tabWidth": 2,
-    "semi": true,
-    "singleQuote": false,
-    "printWidth": 140
+    "arrowParens": "avoid",
+    "printWidth": 120,
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "es5"
   }
 }
