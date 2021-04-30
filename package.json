@@ -15,7 +15,10 @@
   },
   "license": "MIT",
   "scripts": {
-    "test": "mocha tests/** --exit",
+    "test": "mocha tests/** --exit && jest",
+    "jest": "jest",
+    "jest:watch": "jest --watch",
+    "jest:watch-update": "jest --watch -u",
     "build": "./build.sh"
   },
   "keywords": [
@@ -31,9 +34,12 @@
   },
   "devDependencies": {
     "@kth/eslint-config-kth": "^1.0.10",
+    "@types/jest": "^26.0.20",
     "chai": "^4.3.4",
     "eslint": "^7.24.0",
     "husky": "^6.0.0",
+    "jest": "^26.6.3",
+    "jest-extended": "^0.11.5",
     "mocha": "^8.3.2",
     "nock": "^13.0.11",
     "prettier": "^2.2.1",
@@ -41,11 +47,22 @@
     "redis-mock": "^0.56.3",
     "sinon": "^10.0.0"
   },
+  "// (prettier)": "configuration version 2020-06-15 - might also reside in .prettierrc.json",
   "prettier": {
     "arrowParens": "avoid",
     "printWidth": 120,
     "semi": false,
     "singleQuote": true,
     "trailingComma": "es5"
+  },
+  "// (jest)": "configuration version 2020-06-15 (API+NPM) - might also reside as module.exports in jest.config.js",
+  "jest": {
+    "clearMocks": true,
+    "notifyMode": "failure-change",
+    "setupFilesAfterEnv": [
+      "jest-extended"
+    ],
+    "testEnvironment": "node",
+    "verbose": true
   }
 }
