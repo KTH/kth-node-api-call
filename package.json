@@ -19,7 +19,8 @@
     "jest": "jest",
     "jest:watch": "jest --watch",
     "jest:watch-update": "jest --watch -u",
-    "build": "./build.sh"
+    "build": "./build.sh",
+    "prepare": "bash -c 'if [ -f ./node_modules/.bin/husky ]; then husky install; fi'"
   },
   "keywords": [
     "api",
@@ -34,9 +35,9 @@
   },
   "devDependencies": {
     "@kth/eslint-config-kth": "^1.0.10",
-    "@types/jest": "^26.0.20",
+    "@types/jest": "^26.0.23",
     "chai": "^4.3.4",
-    "eslint": "^7.24.0",
+    "eslint": "^7.25.0",
     "husky": "^6.0.0",
     "jest": "^26.6.3",
     "jest-extended": "^0.11.5",
