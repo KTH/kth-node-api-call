@@ -4,15 +4,15 @@
  */
 
 // Load the request module
-var httpRequest = require("request");
-var Q = require("q");
-const uuidv1 = require("uuid/v1");
+var httpRequest = require('request')
+var Q = require('q')
+const uuidv1 = require('uuid/v1')
 
-module.exports = (function() {
-  var MIME_JSON = "application/json";
-  var MIME_TEXT = "text/plain";
-  var HEADER_ACCEPT = "accept";
-  var REQUEST_GUID = "request-guid";
+module.exports = (function () {
+  var MIME_JSON = 'application/json'
+  var MIME_TEXT = 'text/plain'
+  var HEADER_ACCEPT = 'accept'
+  var REQUEST_GUID = 'request-guid'
 
   /**
    * Wrap our constructor in a factory method.
@@ -20,7 +20,7 @@ module.exports = (function() {
    * @returns {Api} a new instance of an Api class
    */
   function factory(options) {
-    return new Api(options);
+    return new Api(options)
   }
 
   /**
@@ -41,9 +41,9 @@ module.exports = (function() {
    */
   function Api(apiOptions) {
     // default options
-    var options = defaultOptions(apiOptions);
+    var options = defaultOptions(apiOptions)
 
-    this.debugMode = apiOptions.debugMode || false;
+    this.debugMode = apiOptions.debugMode || false
 
     this.httpRequestSettings = {
       url: buildRequestUri(options),
@@ -54,14 +54,14 @@ module.exports = (function() {
       body: JSON.stringify(options.data),
       headers: options.headers,
       encoding: options.encoding,
-    };
+    }
 
-    this.debugPrint = function(msg) {
-      var self = this;
+    this.debugPrint = function (msg) {
+      var self = this
       if (self.debugMode) {
-        console.log(msg);
+        console.log(msg)
       }
-    };
+    }
   }
 
   /**
@@ -70,14 +70,14 @@ module.exports = (function() {
    * @param onSuccess callback for success, receives the response json data as a parameter
    * @param onError callback for then call fails, receives the error as a parameter
    */
-  Api.prototype.getJson = function(onSuccess, onError) {
-    var self = this;
-    self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_JSON;
-    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuid();
-    self.httpRequestSettings.method = "GET";
+  Api.prototype.getJson = function (onSuccess, onError) {
+    var self = this
+    self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_JSON
+    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuid()
+    self.httpRequestSettings.method = 'GET'
 
-    self.request(onSuccess, onError);
-  };
+    self.request(onSuccess, onError)
+  }
 
   /**
    * Sends a GET request to the configured api expecting a text/plain response
@@ -85,15 +85,15 @@ module.exports = (function() {
    * @param onSuccess callback for success, receives the response text data as a parameter
    * @param onError callback for then call fails, receives the error as a parameter
    */
-  Api.prototype.getText = function(onSuccess, onError) {
-    var self = this;
-    self.json = false;
-    self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_TEXT;
-    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuid();
-    self.httpRequestSettings.method = "GET";
+  Api.prototype.getText = function (onSuccess, onError) {
+    var self = this
+    self.json = false
+    self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_TEXT
+    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuid()
+    self.httpRequestSettings.method = 'GET'
 
-    self.request(onSuccess, onError);
-  };
+    self.request(onSuccess, onError)
+  }
 
   /**
    * Sends a POST request to the configured api, with a JSON payload
@@ -102,15 +102,15 @@ module.exports = (function() {
    * @param onSuccess callback for success, receives the response json data as a parameter
    * @param onError callback for then call fails, receives the error as a parameter
    */
-  Api.prototype.postJson = function(data, onSuccess, onError) {
-    var self = this;
-    self.httpRequestSettings.json = true;
-    self.httpRequestSettings.method = "POST";
-    self.httpRequestSettings.body = data;
-    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuid();
+  Api.prototype.postJson = function (data, onSuccess, onError) {
+    var self = this
+    self.httpRequestSettings.json = true
+    self.httpRequestSettings.method = 'POST'
+    self.httpRequestSettings.body = data
+    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuid()
 
-    self.request(onSuccess, onError);
-  };
+    self.request(onSuccess, onError)
+  }
 
   /**
    * Sends a request to the configured api
@@ -118,27 +118,27 @@ module.exports = (function() {
    * @param onSuccess callback for success, receives the response json data as a parameter
    * @param onError callback for then call fails, receives the error as a parameter
    */
-  Api.prototype.request = function(onSuccess, onError) {
-    var self = this;
+  Api.prototype.request = function (onSuccess, onError) {
+    var self = this
 
-    self.debugPrint("GET Request settings: " + JSON.stringify(self.httpRequestSettings));
+    self.debugPrint('GET Request settings: ' + JSON.stringify(self.httpRequestSettings))
 
     // handle response, i.e. call correct callback
-    httpRequest(self.httpRequestSettings, handleResponse(self, onSuccess, onError));
-  };
+    httpRequest(self.httpRequestSettings, handleResponse(self, onSuccess, onError))
+  }
 
   /**
    * Sends a GET request to the configured api expecting a text/plain response
    */
-  Api.prototype.promisedGetText = function() {
-    var self = this;
-    self.json = false;
-    self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_TEXT;
-    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuid();
-    self.httpRequestSettings.method = "GET";
+  Api.prototype.promisedGetText = function () {
+    var self = this
+    self.json = false
+    self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_TEXT
+    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuid()
+    self.httpRequestSettings.method = 'GET'
 
-    return self.promisedApiCall();
-  };
+    return self.promisedApiCall()
+  }
 
   /**
    * Method returning api calls as promise.
@@ -147,23 +147,23 @@ module.exports = (function() {
    * - the response object/json
    * @return promise for the api call
    */
-  Api.prototype.promisedApiCall = function() {
-    var self = this;
+  Api.prototype.promisedApiCall = function () {
+    var self = this
 
-    var deferred = Q.defer();
+    var deferred = Q.defer()
 
-    self.debugPrint("Deferred call: " + JSON.stringify(self.httpRequestSettings));
+    self.debugPrint('Deferred call: ' + JSON.stringify(self.httpRequestSettings))
 
     self.request(
-      function(data) {
-        deferred.resolve(data); // fulfills the promise with `data` as the value
+      function (data) {
+        deferred.resolve(data) // fulfills the promise with `data` as the value
       },
-      function(err) {
-        deferred.reject(err); // rejects the promise with `err` as the reason
+      function (err) {
+        deferred.reject(err) // rejects the promise with `err` as the reason
       }
-    );
-    return deferred.promise; // the promise is returned
-  };
+    )
+    return deferred.promise // the promise is returned
+  }
 
   // helper functions
 
@@ -171,85 +171,85 @@ module.exports = (function() {
    *
    */
   function defaultOptions(requestOptions) {
-    var options = requestOptions || {};
+    var options = requestOptions || {}
     // default options
-    options.port = requestOptions.port;
-    options.method = requestOptions.method || "GET";
-    options.path = requestOptions.path || "/";
-    options.headers = requestOptions.headers || {};
-    options.json = requestOptions.json || true;
-    options.qsOptions = requestOptions.qsOptions || { arrayFormat: "brackets" };
-    options.encoding = requestOptions.encoding || "utf8";
+    options.port = requestOptions.port
+    options.method = requestOptions.method || 'GET'
+    options.path = requestOptions.path || '/'
+    options.headers = requestOptions.headers || {}
+    options.json = requestOptions.json || true
+    options.qsOptions = requestOptions.qsOptions || { arrayFormat: 'brackets' }
+    options.encoding = requestOptions.encoding || 'utf8'
 
-    if (typeof requestOptions.https === "undefined" || requestOptions.https) {
-      options.https = true;
+    if (typeof requestOptions.https === 'undefined' || requestOptions.https) {
+      options.https = true
     } else {
-      options.https = false;
+      options.https = false
     }
 
-    options.headers = normalizeHeaders(options.headers);
+    options.headers = normalizeHeaders(options.headers)
 
-    return options;
+    return options
   }
 
   /*
    * response handler wrapper function
    */
   function handleResponse(self, onSuccess, onError) {
-    return function(error, response, body) {
-      onError = onError || function() {};
-      onSuccess = onSuccess || function() {};
+    return function (error, response, body) {
+      onError = onError || function () {}
+      onSuccess = onSuccess || function () {}
       if (error) {
-        onError(error);
-        self.debugPrint("Error: " + error);
+        onError(error)
+        self.debugPrint('Error: ' + error)
       } else {
         // if status code is bad, return an error
         if (response.statusCode >= 400) {
           return onError({
             statusCode: response.statusCode,
             body: response.body,
-          });
+          })
         }
-        onSuccess(body);
-        self.debugPrint("Response: " + response.statusCode, body);
+        onSuccess(body)
+        self.debugPrint('Response: ' + response.statusCode, body)
       }
-    };
+    }
   }
 
   /*
    * build ther call uri
    */
   function buildRequestUri(options) {
-    var requestUri = "http://";
+    var requestUri = 'http://'
     if (options.https) {
-      requestUri = "https://";
+      requestUri = 'https://'
     }
 
-    requestUri += options.host;
+    requestUri += options.host
 
     if (options.port) {
-      requestUri += ":" + options.port;
+      requestUri += ':' + options.port
     }
-    requestUri += options.path;
+    requestUri += options.path
 
-    return requestUri;
+    return requestUri
   }
 
   /*
    * normalize headers, i.e. lower case all header names.
    */
   function normalizeHeaders(headers) {
-    if (!headers || typeof headers !== "object") return;
+    if (!headers || typeof headers !== 'object') return
 
-    var normalizedHeaders = {};
+    var normalizedHeaders = {}
     for (var name in headers) {
       if (headers.hasOwnProperty(name)) {
-        normalizedHeaders[name.toLowerCase()] = headers[name];
+        normalizedHeaders[name.toLowerCase()] = headers[name]
       }
     }
 
-    return normalizedHeaders;
+    return normalizedHeaders
   }
 
-  return factory;
-})();
+  return factory
+})()

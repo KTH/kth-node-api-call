@@ -1,10 +1,10 @@
 /**
  * Class to handle OpenIDConnect discovery through .well-known
  */
-var api = require("./api");
-var url = require("url");
+var api = require('./api')
+var url = require('url')
 
-module.exports = (function() {
+module.exports = (function () {
   /**
    * Factory function to hide class instantiation.
    *
@@ -12,7 +12,7 @@ module.exports = (function() {
    * @returns {Discovery}
    */
   function factory(config) {
-    return new Discovery(config);
+    return new Discovery(config)
   }
 
   /**
@@ -22,7 +22,7 @@ module.exports = (function() {
    * @constructor
    */
   function Discovery(config) {
-    this.config = config || {};
+    this.config = config || {}
   }
 
   /**
@@ -30,31 +30,31 @@ module.exports = (function() {
    * @param onDiscovered callback on when discovery was successful
    * @param onError callback on when error occurred during discovery
    */
-  Discovery.prototype.discover = function(onDiscovered, onError) {
+  Discovery.prototype.discover = function (onDiscovered, onError) {
     // Begin by fetching data from the discovery endpoint
     getDiscoveryData(
       this.config,
-      function(discoveryData) {
+      function (discoveryData) {
         if (!discoveryData.jwks_uri) {
-          onError("jwkEndpoint missing from OIDC discovery data");
+          onError('jwkEndpoint missing from OIDC discovery data')
         }
 
         // If discovery went OK, fetch the jwk endpoint data
         getJwkData(
           discoveryData.jwks_uri,
-          function(jwkData) {
-            onDiscovered(discoveryData, jwkData);
+          function (jwkData) {
+            onDiscovered(discoveryData, jwkData)
           },
-          function(err) {
-            onError(err);
+          function (err) {
+            onError(err)
           }
-        );
+        )
       },
-      function(err) {
-        onError(err);
+      function (err) {
+        onError(err)
       }
-    );
-  };
+    )
+  }
 
   /**
    * Makes an API call to the OpenIDConnect providers discovery endpoint and
@@ -66,9 +66,9 @@ module.exports = (function() {
   function getDiscoveryData(config, onSuccess, onError) {
     var discoveryApi = api({
       host: config.host,
-      path: config.path
-    });
-    discoveryApi.request(onSuccess, onError);
+      path: config.path,
+    })
+    discoveryApi.request(onSuccess, onError)
   }
 
   /**
@@ -79,17 +79,17 @@ module.exports = (function() {
    * @param onError callback for when an error occurs during jwk endpoint fetching
    */
   function getJwkData(jwksUri, onSuccess, onError) {
-    var parsedJwkEndpoint = url.parse(jwksUri);
+    var parsedJwkEndpoint = url.parse(jwksUri)
     var jwkDiscovery = api({
       host: parsedJwkEndpoint.host,
-      path: parsedJwkEndpoint.pathname
-    });
+      path: parsedJwkEndpoint.pathname,
+    })
 
-    jwkDiscovery.request(onSuccess, onError);
+    jwkDiscovery.request(onSuccess, onError)
   }
 
   /**
    * Module exposes the factory method.
    */
-  return factory;
-})();
+  return factory
+})()
