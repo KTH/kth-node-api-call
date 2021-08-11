@@ -3,7 +3,8 @@
 const request = require('request')
 const querystring = require('querystring')
 const url = require('url')
-const uuidv1 = require('uuid/v1')
+const { v4: uuidv4 } = require('uuid')
+
 const REQUEST_GUID = 'request-guid'
 /**
  * Creates a wrapper around request with useful defaults.
@@ -379,11 +380,11 @@ function _makeRequest(api, options, method, callback) {
   if (typeof options === 'string') {
     options = {
       uri: uri,
-      requestGuid: uuidv1(),
+      requestGuid: uuidv4(),
     }
   } else {
     options.uri = uri
-    options.requestGuid = options.requestGuid || uuidv1()
+    options.requestGuid = options.requestGuid || uuidv4()
   }
   if (!options.headers) {
     options.headers = {}

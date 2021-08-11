@@ -6,7 +6,7 @@
 // Load the request module
 var httpRequest = require('request')
 var Q = require('q')
-const uuidv1 = require('uuid/v1')
+const { v4: uuidv4 } = require('uuid')
 
 module.exports = (function () {
   var MIME_JSON = 'application/json'
@@ -73,7 +73,7 @@ module.exports = (function () {
   Api.prototype.getJson = function (onSuccess, onError) {
     var self = this
     self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_JSON
-    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuid()
+    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuidv4()
     self.httpRequestSettings.method = 'GET'
 
     self.request(onSuccess, onError)
@@ -89,7 +89,7 @@ module.exports = (function () {
     var self = this
     self.json = false
     self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_TEXT
-    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuid()
+    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuidv4()
     self.httpRequestSettings.method = 'GET'
 
     self.request(onSuccess, onError)
@@ -107,7 +107,7 @@ module.exports = (function () {
     self.httpRequestSettings.json = true
     self.httpRequestSettings.method = 'POST'
     self.httpRequestSettings.body = data
-    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuid()
+    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuidv4()
 
     self.request(onSuccess, onError)
   }
@@ -134,7 +134,7 @@ module.exports = (function () {
     var self = this
     self.json = false
     self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_TEXT
-    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuid()
+    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuidv4()
     self.httpRequestSettings.method = 'GET'
 
     return self.promisedApiCall()
