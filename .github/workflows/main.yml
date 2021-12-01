@@ -2,13 +2,17 @@ name: Evolene CI
 
 on:  
   push:
+    branches:
+      - master
+    paths-ignore:
+      - '*.md'
+      - '*.png'
   pull_request:
     branches:
       - master
     paths-ignore:
-          - '*.md'
-          - '*.png'
-  workflow_dispatch:
+      - '*.md'
+      - '*.png'
 
 jobs:
   Evolene:
