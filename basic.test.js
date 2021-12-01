@@ -219,7 +219,7 @@ describe('Exported function "BasicAPI"', () => {
     it(`has a method get(options, callback) with expected behaviour`, async () => {
       const get = api.get.bind(api)
 
-      expect(get).toThrow('Cannot read property')
+      expect(get).toThrow('Cannot read propert') // Originally 'property', changed to accommodate 'properties' as well
 
       get('test/1')
 
