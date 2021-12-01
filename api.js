@@ -3,7 +3,6 @@
  * @type {*}
  */
 
-// Load the request module
 var httpRequest = require('request')
 var Q = require('q')
 const { v4: uuidv4 } = require('uuid')
