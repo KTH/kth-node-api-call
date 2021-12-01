@@ -2,7 +2,7 @@
 
 # Overview
 
-Node module used to make JSON calls against APIs.
+Node module used to make JSON calls against APIs. 
 
 To use in your node project, add the following line to your package.json:
 
