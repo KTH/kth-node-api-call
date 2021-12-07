@@ -59,11 +59,11 @@ describe('Testing connection', () => {
 
     const originalExit = process.exit
     const mockedExit = jest.fn()
-    global.process.exit = mockedExit
+    process.exit = mockedExit
     connections.setup(mockApiConfig, mockApiKeyConfig, opts)
 
     setTimeout(() => {
-      global.process.exit = originalExit
+      process.exit = originalExit
       expect(mockedExit).toBeCalledWith(1)
       done()
     }, 500) // wait for setup to finish
@@ -89,10 +89,42 @@ describe('Testing connection', () => {
     paths['/api/test/_checkAPIkey'] = [{ statusCode: 200, body: {} }]
     const originalExit = process.exit
     const mockedExit = jest.fn()
-    global.process.exit = mockedExit
+    process.exit = mockedExit
     const output = connections.setup(mockApiConfig, mockApiKeyConfig, opts)
     setTimeout(() => {
-      global.process.exit = originalExit
+      process.exit = originalExit
+      expect(output.testApi.connected).toBeTrue()
+      done()
+    }, 500) // wait for setup to finish
+  })
+
+  it("should retry the api connection if it doesn't gets a bad status code response", done => {
+    paths['/api/test/_paths'] = [
+      { statusCode: 503, body: { message: 'Service Unavailable' } },
+      {
+        statusCode: 200,
+        body: {
+          path1: {
+            uri: '/api/test/v1/path1/:param1',
+            method: 'GET',
+            apikey: {
+              scope_required: true,
+              scopes: ['read'],
+              type: 'api_key',
+            },
+          },
+        },
+      },
+    ]
+    paths['/api/test/_checkAPIkey'] = [{ statusCode: 200, body: {} }]
+
+    const originalExit = process.exit
+    const mockedExit = jest.fn()
+    process.exit = mockedExit
+
+    const output = connections.setup(mockApiConfig, mockApiKeyConfig, opts)
+    setTimeout(() => {
+      process.exit = originalExit
       expect(output.testApi.connected).toBeTrue()
       done()
     }, 500) // wait for setup to finish
