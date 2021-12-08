@@ -24,6 +24,8 @@ const mockLogger = {
   warn: () => {},
   info: () => {},
 }
+/*const mockLogger = {}
+mockLogger.debug = mockLogger.error = mockLogger.warn = mockLogger.info = console.log*/
 
 const opts = {
   log: mockLogger,
@@ -41,12 +43,14 @@ const paths = {}
 
 jest.mock('./basic', () =>
   jest.fn().mockImplementation(() => ({
-    getAsync: uri =>
-      new Promise((resolve, reject) =>
+    getAsync: uri => {
+      const myUri = uri.uri ? uri.uri : uri
+      return new Promise((resolve, reject) =>
         process.nextTick(() =>
-          paths[uri] ? resolve(paths[uri].shift()) : reject(new Error('Path ' + uri + ' not found.'))
+          paths[myUri] ? resolve(paths[myUri].shift()) : reject(new Error('Path ' + myUri + ' not found.'))
         )
-      ),
+      )
+    },
   }))
 )
 
@@ -87,12 +91,9 @@ describe('Testing connection', () => {
       },
     ]
     paths['/api/test/_checkAPIkey'] = [{ statusCode: 200, body: {} }]
-    const originalExit = process.exit
-    const mockedExit = jest.fn()
-    process.exit = mockedExit
+
     const output = connections.setup(mockApiConfig, mockApiKeyConfig, opts)
     setTimeout(() => {
-      process.exit = originalExit
       expect(output.testApi.connected).toBeTrue()
       done()
     }, 500) // wait for setup to finish
@@ -118,13 +119,8 @@ describe('Testing connection', () => {
     ]
     paths['/api/test/_checkAPIkey'] = [{ statusCode: 200, body: {} }]
 
-    const originalExit = process.exit
-    const mockedExit = jest.fn()
-    process.exit = mockedExit
-
     const output = connections.setup(mockApiConfig, mockApiKeyConfig, opts)
     setTimeout(() => {
-      process.exit = originalExit
       expect(output.testApi.connected).toBeTrue()
       done()
     }, 500) // wait for setup to finish
