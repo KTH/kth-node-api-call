@@ -24,8 +24,8 @@ const mockLogger = {
   warn: () => {},
   info: () => {},
 }
-/*const mockLogger = {}
-mockLogger.debug = mockLogger.error = mockLogger.warn = mockLogger.info = console.log*/
+/* const mockLogger = {}
+mockLogger.debug = mockLogger.error = mockLogger.warn = mockLogger.info = console.log */
 
 const opts = {
   log: mockLogger,
@@ -46,13 +46,13 @@ jest.mock('./basic', () =>
     getAsync: uri => {
       const myUri = uri.uri ? uri.uri : uri
       return new Promise((resolve, reject) =>
-        process.nextTick(() =>
-          paths[myUri] ? resolve(paths[myUri].shift()) : reject(new Error('Path ' + myUri + ' not found.'))
-        )
+        paths[myUri] ? resolve(paths[myUri].shift()) : reject(new Error('Path ' + myUri + ' not found.'))
       )
     },
   }))
 )
+
+process.exit = jest.fn()
 
 describe('Testing connection', () => {
   it(IS_ACCESSIBLE, () => expect(connections.setup).toBeFunction())
@@ -61,14 +61,10 @@ describe('Testing connection', () => {
     paths['/api/test/_paths'] = [{ statusCode: 200, body: {} }]
     paths['/api/test/_checkAPIkey'] = [{ statusCode: 401, body: {} }]
 
-    const originalExit = process.exit
-    const mockedExit = jest.fn()
-    process.exit = mockedExit
     connections.setup(mockApiConfig, mockApiKeyConfig, opts)
 
     setTimeout(() => {
-      process.exit = originalExit
-      expect(mockedExit).toBeCalledWith(1)
+      expect(process.exit).toBeCalledWith(1)
       done()
     }, 500) // wait for setup to finish
   })
@@ -95,6 +91,7 @@ describe('Testing connection', () => {
     const output = connections.setup(mockApiConfig, mockApiKeyConfig, opts)
     setTimeout(() => {
       expect(output.testApi.connected).toBeTrue()
+      expect(process.exit).not.toBeCalled()
       done()
     }, 500) // wait for setup to finish
   })
@@ -122,6 +119,7 @@ describe('Testing connection', () => {
     const output = connections.setup(mockApiConfig, mockApiKeyConfig, opts)
     setTimeout(() => {
       expect(output.testApi.connected).toBeTrue()
+      expect(process.exit).not.toBeCalled()
       done()
     }, 500) // wait for setup to finish
   })
