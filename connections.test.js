@@ -52,9 +52,12 @@ jest.mock('./basic', () =>
   }))
 )
 
-process.exit = jest.fn()
-
 describe('Testing connection', () => {
+  const originalProcessExit = process.exit
+  beforeAll(() => {
+    process.exit = jest.fn()
+  })
+
   it(IS_ACCESSIBLE, () => expect(connections.setup).toBeFunction())
 
   it('should shut down on bad API key', done => {
@@ -122,5 +125,9 @@ describe('Testing connection', () => {
       expect(process.exit).not.toBeCalled()
       done()
     }, 500) // wait for setup to finish
+  })
+
+  afterAll(() => {
+    process.exit = originalProcessExit
   })
 })
