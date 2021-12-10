@@ -18,14 +18,13 @@ const mockApiKeyConfig = {
   testApi: '1234',
 }
 
+const logConsole = false
 const mockLogger = {
-  debug: () => {},
-  error: () => {},
-  warn: () => {},
-  info: () => {},
+  debug: logConsole ? console.log : () => {},
+  error: logConsole ? console.log : () => {},
+  warn: logConsole ? console.log : () => {},
+  info: logConsole ? console.log : () => {},
 }
-/* const mockLogger = {}
-mockLogger.debug = mockLogger.error = mockLogger.warn = mockLogger.info = console.log */
 
 const opts = {
   log: mockLogger,
@@ -41,14 +40,25 @@ const opts = {
 
 const paths = {}
 
+const apicall = uri => {
+  const myUri = uri.uri ? uri.uri : uri
+  return new Promise((resolve, reject) => {
+    if (paths[myUri]) {
+      const answer = paths[myUri].shift()
+      if (answer.answerTimeout)
+        throw new Error(
+          `The request with guid XXX timed out after ${this._maxNumberOfRetries} retries. The connection to the API seems to be overloaded.`
+        )
+      else resolve(answer)
+    } else {
+      reject(new Error('Path ' + myUri + ' not found.'))
+    }
+  })
+}
+
 jest.mock('./basic', () =>
   jest.fn().mockImplementation(() => ({
-    getAsync: uri => {
-      const myUri = uri.uri ? uri.uri : uri
-      return new Promise((resolve, reject) =>
-        paths[myUri] ? resolve(paths[myUri].shift()) : reject(new Error('Path ' + myUri + ' not found.'))
-      )
-    },
+    getAsync: jest.fn(apicall),
   }))
 )
 
@@ -59,6 +69,10 @@ describe('Testing connection', () => {
   })
 
   it(IS_ACCESSIBLE, () => expect(connections.setup).toBeFunction())
+
+  it('should throw exception if no api config is provided or not object', () => {
+    expect(() => connections.setup('INVALID', mockApiKeyConfig, opts)).toThrowError(/Apis config is required/)
+  })
 
   it('should shut down on bad API key', done => {
     paths['/api/test/_paths'] = [{ statusCode: 200, body: {} }]
@@ -93,8 +107,25 @@ describe('Testing connection', () => {
 
     const output = connections.setup(mockApiConfig, mockApiKeyConfig, opts)
     setTimeout(() => {
+      expect(process.exit).not.toBeCalled()
+      expect(output.testApi.client.getAsync).toBeCalled()
+      done()
+    }, 500) // wait for setup to finish
+  })
+
+  it('should not test connection if doNotCallPathsEndpoint is set', done => {
+    paths['/api/test/_checkAPIkey'] = [{ statusCode: 200, body: {} }]
+
+    const output = connections.setup(
+      { testApi: { ...mockApiConfig.testApi, doNotCallPathsEndpoint: true } },
+      mockApiKeyConfig,
+      { ...opts }
+    )
+    setTimeout(() => {
       expect(output.testApi.connected).toBeTrue()
       expect(process.exit).not.toBeCalled()
+      // Should only be called once to check API key
+      expect(output.testApi.client.getAsync).toBeCalledTimes(1)
       done()
     }, 500) // wait for setup to finish
   })
@@ -122,6 +153,17 @@ describe('Testing connection', () => {
     const output = connections.setup(mockApiConfig, mockApiKeyConfig, opts)
     setTimeout(() => {
       expect(output.testApi.connected).toBeTrue()
+      expect(process.exit).not.toBeCalled()
+      done()
+    }, 500) // wait for setup to finish
+  })
+
+  xit('should not be connected if unable to retreive paths', done => {
+    paths['/api/test/_checkAPIkey'] = [{ statusCode: 200, body: {} }]
+    paths['/api/test/_paths'] = [{ answerTimeout: true }, { statusCode: 404, body: {} }]
+    const output = connections.setup(mockApiConfig, mockApiKeyConfig, opts)
+    setTimeout(() => {
+      expect(output.testApi.connected).toBeFalse()
       expect(process.exit).not.toBeCalled()
       done()
     }, 500) // wait for setup to finish
