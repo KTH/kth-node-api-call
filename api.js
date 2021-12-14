@@ -3,10 +3,9 @@
  * @type {*}
  */
 
-// Load the request module
-var httpRequest = require('request')
 var Q = require('q')
 const { v4: uuidv4 } = require('uuid')
+const { fetchWrapper } = require('./fetchUtils')
 
 module.exports = (function () {
   var MIME_JSON = 'application/json'
@@ -124,7 +123,7 @@ module.exports = (function () {
     self.debugPrint('GET Request settings: ' + JSON.stringify(self.httpRequestSettings))
 
     // handle response, i.e. call correct callback
-    httpRequest(self.httpRequestSettings, handleResponse(self, onSuccess, onError))
+    fetchWrapper(self.httpRequestSettings, handleResponse(self, onSuccess, onError))
   }
 
   /**

@@ -79,7 +79,7 @@ function getTestOptions(target) {
   }
 }
 
-describe('Exported function "BasicAPI"', () => {
+describe.skip('Exported function "BasicAPI"', () => {
   it(IS_ACCESSIBLE, () => expect(BasicApiExport).toBeFunction())
 
   runTestsAboutPrototypeMethods()

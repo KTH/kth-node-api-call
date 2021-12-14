@@ -1,9 +1,9 @@
 'use strict'
 
-const request = require('request')
 const querystring = require('querystring')
 const url = require('url')
 const { v4: uuidv4 } = require('uuid')
+const { fetchWrappers } = require('./fetchUtils')
 
 const REQUEST_GUID = 'request-guid'
 /**
@@ -48,7 +48,7 @@ function BasicAPI(options, base) {
     pool: { maxSockets: Infinity },
   }
 
-  this._request = request.defaults(opts)
+  this._request = fetchWrappers(opts)
   this._redis = options.redis
   this._hasRedis = !!(this._redis && this._redis.client)
   this._basePath = options.basePath || ''
@@ -240,6 +240,7 @@ BasicAPI.prototype.patchAsync = function (options) {
 
 /**
  * Creates a cookie to be passed to a jar.
+ * @deprecated since version 4
  * @param {string} cookie
  * @returns {*}
  */
@@ -250,6 +251,7 @@ BasicAPI.prototype.cookie = function (cookie) {
 /**
  * Creates a jar that accepts cookies. The jar can then be
  * passed to a request.
+ * @deprecated since version 4
  * @returns {*}
  */
 BasicAPI.prototype.jar = function () {

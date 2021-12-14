@@ -29,6 +29,7 @@
     "json"
   ],
   "dependencies": {
+    "node-fetch": "^2.6.6",
     "q": "^1.5.1",
     "request": "^2.88.2",
     "url-join": "^4.0.1",
