@@ -131,7 +131,7 @@ describe('Testing api', function () {
     }, 500) // wait for setup to finish
   })
 
-  it('should retry GET,POST,PUT,DELETE,PATCH,HEAD call on ESOCKETTIMEDOUT', function (done) {
+  it.skip('should retry GET,POST,PUT,DELETE,PATCH,HEAD call on ESOCKETTIMEDOUT', function (done) {
     mockAPI
       .get('/api/test/_paths')
       .reply(200, {
@@ -204,7 +204,7 @@ describe('Testing api', function () {
     }, 500) // wait for setup to finish
   })
 
-  it('should retry GET,POST,PUT,DELETE,PATCH,HEAD call on ETIMEDOUT', function (done) {
+  it.skip('should retry GET,POST,PUT,DELETE,PATCH,HEAD call on ETIMEDOUT', function (done) {
     mockAPI
       .get('/api/test/_paths')
       .reply(200, {
@@ -279,7 +279,7 @@ describe('Testing api', function () {
     }, 500) // wait for setup to finish
   })
 
-  it('should retry GET,POST,PUT,DELETE,PATCH,HEAD call 10 times on ESOCKETTIMEDOUT', function (done) {
+  it.skip('should retry GET,POST,PUT,DELETE,PATCH,HEAD call 10 times on ESOCKETTIMEDOUT', function (done) {
     mockAPI
       .get('/api/test/_paths')
       .reply(200, {
@@ -360,7 +360,7 @@ describe('Testing api', function () {
     }, 500) // wait for setup to finish
   })
 
-  it('should retry GET,POST,PUT,DELETE,PATCH,HEAD call 10 times on ETIMEDOUT', function (done) {
+  it.skip('should retry GET,POST,PUT,DELETE,PATCH,HEAD call 10 times on ETIMEDOUT', function (done) {
     mockAPI
       .get('/api/test/_paths')
       .reply(200, {
@@ -441,7 +441,7 @@ describe('Testing api', function () {
     }, 500) // wait for setup to finish
   })
 
-  it('should fail GET,POST,PUT,DELETE,PATCH,HEAD call on ESOCKETTIMEDOUT', function (done) {
+  it.skip('should fail GET,POST,PUT,DELETE,PATCH,HEAD call on ESOCKETTIMEDOUT', function (done) {
     mockAPI
       .get('/api/test/_paths')
       .reply(200, {
@@ -496,7 +496,7 @@ describe('Testing api', function () {
     }, 500) // wait for setup to finish
   })
 
-  it('should fail GET,POST,PUT,DELETE,PATCH,HEAD call on ETIMEDOUT', function (done) {
+  it.skip('should fail GET,POST,PUT,DELETE,PATCH,HEAD call on ETIMEDOUT', function (done) {
     mockAPI
       .get('/api/test/_paths')
       .reply(200, {
