@@ -1,9 +1,14 @@
 /* eslint-disable no-console */
 const fetch = require('node-fetch')
 
+const MIME_JSON = 'application/json'
+const HEADER_CONTENT_LENGTH = 'content-length'
+const HEADER_CONTENT_TYPE = 'content-type'
+
 async function _parseResponseBody(response, json) {
-  const contentLength = response.headers.get('content-length')
-  if (contentLength === '0') {
+  const contentLength = response.headers.get(HEADER_CONTENT_LENGTH)
+  const contentType = response.headers.get(HEADER_CONTENT_TYPE)
+  if (contentLength === '0' || !contentType.includes(MIME_JSON)) {
     return response.text()
   }
   return json ? response.json() : response.text()
@@ -18,7 +23,7 @@ function _createFetchWrapper(wrapperOptions, method) {
     opts.method = method
     opts.headers = { ...headers, ...opts.headers }
     if (json) {
-      opts.headers['Content-Type'] = 'application/json'
+      opts.headers[HEADER_CONTENT_TYPE] = MIME_JSON
       opts.body = JSON.stringify(opts.body)
     }
 
@@ -99,7 +104,7 @@ async function fetchWrapper(options, callback) {
   const { url, qs, method, json, body, headers } = options
 
   if (json) {
-    headers['Content-Type'] = 'application/json'
+    headers[HEADER_CONTENT_TYPE] = MIME_JSON
   }
 
   const fetchUrl = Object.keys(qs).length === 0 ? url : `${url}?${new URLSearchParams(qs).toString()}`
