@@ -15,7 +15,7 @@ const mockLogger = {
 const opts = {
   hostname: '127.0.0.1',
   host: 'localhost',
-  port: '3001',
+  port: '3210',
   https: false,
   json: true,
   defaultTimeout: 2790,
