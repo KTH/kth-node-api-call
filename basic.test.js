@@ -1,17 +1,48 @@
-const RequestMockup = require('request')
+/* eslint-disable no-console */
+const { IS_ACCESSIBLE } = require('./test-utils')
 
-const DummyLogMockup = {
-  log: jest.fn(),
+const BasicAPI = require('./basic')
+const apiserver = require('./test/mock-api/server')
+
+const logConsole = false
+const mockLogger = {
+  debug: logConsole ? console.log : () => {},
+  error: logConsole ? console.log : () => {},
+  warn: logConsole ? console.log : () => {},
+  info: logConsole ? console.log : () => {},
 }
 
-const DummyRedisMockup = {
-  client: {},
+const opts = {
+  hostname: '127.0.0.1',
+  host: 'localhost',
+  port: '3001',
+  https: false,
+  json: true,
+  defaultTimeout: 2790,
+  headers: { 'Content-Type': 'application/json' },
+  retryOnESOCKETTIMEDOUT: true,
+  maxNumberOfRetries: 7,
+  basePath: '/api/test',
 }
 
-const AllMockups = { RequestMockup, DummyLogMockup, DummyRedisMockup }
+const api = BasicAPI(opts)
 
-const BasicApiExport = require('./basic')
-
+describe('basic calls works as expected', () => {
+  it('performs a get requst when calling getAsync', async () => {
+    const result = await api.getAsync('/method')
+    expect(result.body.method).toBe('get')
+    expect(result.statusCode).toBe(200)
+  })
+  it('performs a post requst when calling postAsync', async () => {
+    const result = await api.postAsync('/method')
+    expect(result.body.method).toBe('post')
+    expect(result.statusCode).toBe(200)
+  })
+  afterAll(async () => {
+    await api.getAsync('/goodbye')
+  })
+})
+/*
 const { EXPECTS, RETURNS, IS_ACCESSIBLE, bold, copyObject, WORKS } = require('./test-utils')
 
 function runTestsAboutPrototypeMethods() {
@@ -253,3 +284,56 @@ describe.skip('Exported function "BasicAPI"', () => {
     })
   })
 })
+*/
+/*
+
+  xit('should retry GET,POST,PUT,DELETE,PATCH,HEAD call on ESOCKETTIMEDOUT', done => {
+    paths['/api/test/_paths'] = [
+      {
+        statusCode: 200,
+        body: {
+          path1: {
+            uri: '/api/test/v1/path1/:param1',
+            method: 'GET',
+            apikey: {
+              scope_required: true,
+              scopes: ['read'],
+              type: 'api_key',
+            },
+          },
+        },
+      },
+    ]
+    paths['/api/test/_checkAPIkey'] = [{ statusCode: 200, body: {} }]
+    paths['/api/test/error'] = Array(6 * 6).fill({ answerTimeout: true })
+
+    const output = connections.setup(mockApiConfig, mockApiKeyConfig, { ...opts, retryOnESOCKETTIMEDOUT: true })
+    setTimeout(() => {
+      const { client } = output.testApi
+      client.getAsync('/api/test/error').catch(e1 => {
+        console.log(paths['/api/test/error'].length)
+        expect(e1.message).toContain('retries. The connection to the API seems to be overloaded.')
+        done()
+      })
+    }, 500) // wait for setup to finish
+  })
+
+
+*/
+
+/*
+const BasicAPI = require('./basic')
+    const opts = {
+      hostname: "www.google.com",
+      port: 443,
+      https: true,
+      json: true,
+      defaultTimeout: 600,
+      headers: {},
+      retryOnESOCKETTIMEDOUT: false,
+      maxNumberOfRetries: 2,
+      log:  {},
+    }
+  const c=new BasicAPI(opts)
+   c.getAsync("/") 
+*/

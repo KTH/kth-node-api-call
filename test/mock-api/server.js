@@ -3,6 +3,7 @@
 'use strict'
 
 const express = require('express')
+const { GracefulShutdownManager } = require('@moebius/http-graceful-shutdown')
 const config = require('./config')
 
 const app = express()
@@ -16,12 +17,16 @@ config.paths.forEach(path => {
   })
 })
 
+const server = app.listen(config.host.port, config.host.address)
+const shutdownManager = new GracefulShutdownManager(server)
+
+app.get('/api/test/goodbye', (req, res) => {
+  setTimeout(() => {
+    shutdownManager.terminate(() => {})
+  }, 500)
+  res.status(200).send({ status: 'Shutdown' })
+})
 app.use((req, res) => {
   // console.log('Caught request on path', req.url)
   res.status(404).send('')
 })
-process.on('SIGTERM', () => {
-  process.exit(0)
-})
-
-app.listen(config.host.port, config.host.address)

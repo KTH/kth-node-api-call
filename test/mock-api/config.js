@@ -30,8 +30,33 @@ module.exports = {
     },
     {
       method: 'get',
-      url: '/api/test/error',
-      response: null,
+      url: '/api/test/method',
+      response: { statusCode: 200, body: { method: 'get' } },
+    },
+    {
+      method: 'post',
+      url: '/api/test/method',
+      response: { statusCode: 200, body: { method: 'post' } },
+    },
+    {
+      method: 'put',
+      url: '/api/test/method',
+      response: { statusCode: 200, body: { method: 'post' } },
+    },
+    {
+      method: 'delete',
+      url: '/api/test/method',
+      response: { statusCode: 200, body: { method: 'del' } },
+    },
+    {
+      method: 'head',
+      url: '/api/test/method',
+      response: { statusCode: 200, body: { method: 'head' } },
+    },
+    {
+      method: 'patch',
+      url: '/api/test/method',
+      response: { statusCode: 200, body: { method: 'patch' } },
     },
   ],
 }
