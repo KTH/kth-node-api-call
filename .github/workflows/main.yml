@@ -4,12 +4,14 @@ on:
   push:
     branches:
       - master
+      - replace-request
     paths-ignore:
       - '*.md'
       - '*.png'
   pull_request:
     branches:
       - master
+      - replace-request
     paths-ignore:
       - '*.md'
       - '*.png'
