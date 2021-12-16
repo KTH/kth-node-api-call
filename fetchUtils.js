@@ -141,6 +141,10 @@ function fetchWrappers(wrapperOptions = {}) {
   return {
     get: _createFetchWrapper(wrapperOptions, 'GET'),
     post: _createFetchWrapper(wrapperOptions, 'POST'),
+    put: _createFetchWrapper(wrapperOptions, 'PUT'),
+    del: _createFetchWrapper(wrapperOptions, 'DELETE'),
+    head: _createFetchWrapper(wrapperOptions, 'HEAD'),
+    patch: _createFetchWrapper(wrapperOptions, 'PATCH'),
   }
 }
 
