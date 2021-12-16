@@ -239,28 +239,9 @@ BasicAPI.prototype.patchAsync = function (options) {
 }
 
 /**
- * Creates a cookie to be passed to a jar.
- * @deprecated since version 4
- * @param {string} cookie
- * @returns {*}
- */
-BasicAPI.prototype.cookie = function (cookie) {
-  return this._request.cookie(cookie)
-}
-
-/**
- * Creates a jar that accepts cookies. The jar can then be
- * passed to a request.
- * @deprecated since version 4
- * @returns {*}
- */
-BasicAPI.prototype.jar = function () {
-  return this._request.jar()
-}
-
-/**
  * Using this request as base, create a new BasicAPI instance
  * passing the options directly into `request.defaults()`.
+ * @deprecated since version 4
  * @param {object} options
  * @returns {BasicAPI}
  */
