@@ -4,17 +4,15 @@
 
 Node module used to make JSON calls against APIs. 
 
-To use in your node project, add the following line to your package.json:
+To use in your node project, run:
 
-```json
-"kth-node-api-call": "https://github.com/KTH/kth-node-api-call.git#version"
+```sh
+npm i kth-node-api-call
 ```
-
-Where 'version' is a commit hash, tag or release.
 
 ## Setup
 
-In your init callback to the express web server, this should happen:
+In your init callback to the Express web server, this should happen:
 
 ```javascript
 const connections = require('kth-node-api-call').Connections
@@ -80,16 +78,16 @@ client.getAsync(client.resolve(paths.[YOUR_ENDPOINT], {user: username, etc...}))
 if you want to use a cached api, add the option `{useCache: true}` to the `getAsync` call like this:
 
 ```javascript
-client.getAsync([FULL_PATH], { useCache: true }).then((response) => {
+client.getAsync([FULL_PATH], { useCache: true }).then(response => {
   // etc.
-});
+})
 ```
 
 ## BasicAPI
 
-This is a more straightforward wrapper around [request][request]. It will allow
-more control but also encourage more code re-use. It allows the use of Promises
-and caching (via redis) of successful responses (status >= 200 and status < 400).
+This used to be a straightforward wrapper around [request][request]. Since version 4, `request` is replaced by [node-fetch][node-fetch], with efforts made to keep the same methods.
+
+`BasicAPI` will allow more control but also encourage more code re-use. It allows the use of Promises and caching (via redis) of successful responses (status >= 200 and status < 400).
 
 For more details see the examples below and [the source code][basicjs].
 
@@ -97,12 +95,12 @@ For more details see the examples below and [the source code][basicjs].
 // configure this and re-use throughout your app
 
 const api = new BasicAPI({
-  hostname: "localhost",
+  hostname: 'localhost',
   port: 3001,
   json: true,
   https: false,
   headers: {
-    api_key: "abcd",
+    api_key: 'abcd',
   },
   // optionally enable redis for response caching
   // redis: {
@@ -110,32 +108,32 @@ const api = new BasicAPI({
   //   prefix: 'node-api',
   //   expire: 120
   // }
-});
+})
 
 // usage example:
 
-const params = { id: 123 };
-const uri = api.resolve("/value/:id", params);
+const params = { id: 123 }
+const uri = api.resolve('/value/:id', params)
 
 // promise
 api
   .getAsync(uri)
-  .then((response) => {
+  .then(response => {
     if (response.statusCode >= 200 && response.statusCode < 400) {
       // do something with response.body
     } else {
       // bad/unexpected status code, delegate error
     }
   })
-  .catch((err) => {
+  .catch(err => {
     // handle/delegate err
-  });
+  })
 
 // or callback
 api.get(uri, (err, response, body) => {
   if (err) {
     // handle/delegate err
-    return;
+    return
   }
 
   if (response.statusCode >= 200 && response.statusCode < 400) {
@@ -143,21 +141,14 @@ api.get(uri, (err, response, body) => {
   } else {
     // bad/unexpected status code, delegate error
   }
-});
+})
 ```
 
 ### HTTP Request Methods
 
-Each of the following sends a corresponding HTTP request.
-Append `Async` (e.g. `getAsync`) to use Promise instead of callback.
-The first parameter should be either a uri (as a string) or an
-options object which is passed to [request][request]. For non-async
-methods the second parameter should be a function with the following
-signature: `function (error, response, body) { ... }`. The callback
-parameters are the same as for the request library.
+Each of the following sends a corresponding HTTP request. Append `Async` (e.g. `getAsync`) to use Promise instead of callback. The first parameter should be either a uri (as a string) or an options object which is passed to [node-fetch][node-fetch]. For non-async methods the second parameter should be a function with the following signature: `function (error, response, body) { ... }`. The callback parameters are the same as for the request library.
 
-Note that if you use Redis and/or the async methods you might lose
-some functionality. For details about this, read the source code!
+Note that if you use Redis and/or the async methods you might lose some functionality. For details about this, read the source code!
 
 - `get`/`getAsync`
 - `post`/`postAsync`
@@ -168,15 +159,14 @@ some functionality. For details about this, read the source code!
 
 ### Utility Methods
 
-- `resolve` takes two parameters. The first is a uri template, e.g.
-  `/value/:name`, and the second is a plain object, e.g. `{ name: 'foo' }`.
-  It will then replace `:name` with the matching values in the object,
-  resolving the uri `/value/foo`.
-- `jar` and `cookie` are basic wrapper to the corresponding [request][request]
-  methods.
-- `defaults` re-uses the same config and applies another configuration set on top.
-  Basically it does the same as `request.defaults()` but returns a valid
-  `BasicAPI` instance.
+- `resolve` takes two parameters. The first is a uri template, e.g. `/value/:name`, and the second is a plain object, e.g. `{ name: 'foo' }`. It will then replace `:name` with the matching values in the object, resolving the uri `/value/foo`.
+- `defaults` re-uses the same config and applies another configuration set on top. Basically it does the same as `request.defaults()` but returns a valid `BasicAPI` instance.
 
-[request]: https://www.npmjs.com/package/request
+### Migration from version 3 to 4
+
+- `jar` and `cookie` where basic wrappers to the corresponding [request][request] methods. They were removed in version 4.
+- `defaults` was deprecated in version 4. Use `new BasicAPI(options)` instead.
+
+[request]: https://github.com/request/request
+[node-fetch]: https://github.com/node-fetch/node-fetch
 [basicjs]: ./basic.js
