@@ -41,7 +41,7 @@ module.exports = {
     {
       method: 'put',
       url: '/api/test/method',
-      response: { statusCode: 200, body: { method: 'post' } },
+      response: { statusCode: 200, body: { method: 'put' } },
     },
     {
       method: 'delete',
@@ -51,7 +51,7 @@ module.exports = {
     {
       method: 'head',
       url: '/api/test/method',
-      response: { statusCode: 200, body: { method: 'head' } },
+      response: { statusCode: 200, body: null },
     },
     {
       method: 'patch',

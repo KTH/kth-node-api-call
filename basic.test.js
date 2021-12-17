@@ -28,14 +28,42 @@ const opts = {
 const api = BasicAPI(opts)
 
 describe('basic calls works as expected', () => {
-  it('performs a get requst when calling getAsync', async () => {
+  xit('performs a get request when calling get', done => {
+    api.get('/method', (req, res) => {
+      console.log(res)
+      expect(res.body.method).toBe('get')
+      expect(res.statusCode).toBe(200)
+      done()
+    })
+  })
+  it('performs a get request when calling getAsync', async () => {
     const result = await api.getAsync('/method')
     expect(result.body.method).toBe('get')
     expect(result.statusCode).toBe(200)
   })
-  it('performs a post requst when calling postAsync', async () => {
+  it('performs a post request when calling postAsync', async () => {
     const result = await api.postAsync('/method')
     expect(result.body.method).toBe('post')
+    expect(result.statusCode).toBe(200)
+  })
+  it('performs a put request when calling putAsync', async () => {
+    const result = await api.putAsync('/method')
+    expect(result.body.method).toBe('put')
+    expect(result.statusCode).toBe(200)
+  })
+  it('performs a delete request when calling delAsync', async () => {
+    const result = await api.delAsync('/method')
+    expect(result.body.method).toBe('del')
+    expect(result.statusCode).toBe(200)
+  })
+  it('performs a patch request when calling patchAsync', async () => {
+    const result = await api.patchAsync('/method')
+    expect(result.body.method).toBe('patch')
+    expect(result.statusCode).toBe(200)
+  })
+  xit('performs a head request when calling headAsync', async () => {
+    const result = await api.headAsync('/method')
+    expect(result.body).toBe(null)
     expect(result.statusCode).toBe(200)
   })
   afterAll(async () => {
