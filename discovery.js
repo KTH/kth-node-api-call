@@ -1,8 +1,10 @@
+/* eslint-disable func-names */
+/* eslint-disable no-use-before-define */
 /**
  * Class to handle OpenIDConnect discovery through .well-known
  */
-var api = require('./api')
-var url = require('url')
+const url = require('url')
+const api = require('./api')
 
 module.exports = (function () {
   /**
@@ -34,7 +36,7 @@ module.exports = (function () {
     // Begin by fetching data from the discovery endpoint
     getDiscoveryData(
       this.config,
-      function (discoveryData) {
+      discoveryData => {
         if (!discoveryData.jwks_uri) {
           onError('jwkEndpoint missing from OIDC discovery data')
         }
@@ -42,15 +44,15 @@ module.exports = (function () {
         // If discovery went OK, fetch the jwk endpoint data
         getJwkData(
           discoveryData.jwks_uri,
-          function (jwkData) {
+          jwkData => {
             onDiscovered(discoveryData, jwkData)
           },
-          function (err) {
+          err => {
             onError(err)
           }
         )
       },
-      function (err) {
+      err => {
         onError(err)
       }
     )
@@ -64,7 +66,7 @@ module.exports = (function () {
    * @param onError callback for when an error occurs during discovery fetching
    */
   function getDiscoveryData(config, onSuccess, onError) {
-    var discoveryApi = api({
+    const discoveryApi = api({
       host: config.host,
       path: config.path,
     })
@@ -79,8 +81,8 @@ module.exports = (function () {
    * @param onError callback for when an error occurs during jwk endpoint fetching
    */
   function getJwkData(jwksUri, onSuccess, onError) {
-    var parsedJwkEndpoint = url.parse(jwksUri)
-    var jwkDiscovery = api({
+    const parsedJwkEndpoint = url.parse(jwksUri)
+    const jwkDiscovery = api({
       host: parsedJwkEndpoint.host,
       path: parsedJwkEndpoint.pathname,
     })

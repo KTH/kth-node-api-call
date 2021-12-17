@@ -1,12 +1,16 @@
+/* eslint-disable func-names */
+/* eslint-disable no-use-before-define */
+
 'use strict'
 
-const BasicAPI = require('./basic')
 const urlJoin = require('url-join')
+const BasicAPI = require('./basic')
 
 const NAME = 'kth-node-api-call'
 
 // default logger if none is provided in the opts object to _setup
 const defaultLog = {}
+// eslint-disable-next-line no-console
 defaultLog.error = defaultLog.info = defaultLog.debug = defaultLog.warn = console.log
 const defaultTimeout = 30000
 
@@ -62,7 +66,7 @@ function setup(apisConfig, apisKeyConfig, opts) {
 
 // check API key and kill if api is required
 function checkAPI(api, log) {
-  const config = api.config
+  const { config } = api
   const apiName = api.key
 
   const statusCheckPath = api.config.statusCheckPath || '_checkAPIkey'
@@ -78,10 +82,8 @@ function checkAPI(api, log) {
         } else if (res.statusCode === 500) {
           throw new Error(`${NAME} Got 500 response on checkAPI call, most likely a bad API key for  ${apiName}`)
         }
-      } else {
-        if (res.statusCode < 200 || res.statusCode >= 300) {
-          throw new Error(`${NAME} API check failed for ${apiName}, got status ${res.statusCode}`)
-        }
+      } else if (res.statusCode < 200 || res.statusCode >= 300) {
+        throw new Error(`${NAME} API check failed for ${apiName}, got status ${res.statusCode}`)
       }
     })
     .catch(err => {
@@ -113,11 +115,11 @@ function createApis(apisConfig, apisKeyConfig, apiOpts) {
       const k = apisKeyConfig[key]
       if (!k) throw new Error(`${NAME} nodeApi ${key} has no api key set.`)
 
-      opts.headers['api_key'] = apisKeyConfig[key]
+      opts.headers.api_key = apisKeyConfig[key]
     }
 
     const api = {
-      key: key,
+      key,
       config: apiConfig,
       connected: false,
       client: new BasicAPI(opts),
@@ -133,9 +135,7 @@ function createApis(apisConfig, apisKeyConfig, apiOpts) {
 
 // retrieve paths from remote /_paths endpoint
 function getPathsRemote(apis, opts) {
-  const connectedApiPromises = apis.map(api => {
-    return connect(api, opts)
-  })
+  const connectedApiPromises = apis.map(api => connect(api, opts))
   return connectedApiPromises
 }
 
@@ -156,23 +156,22 @@ function connect(api, opts) {
         api.connected = true
         opts.log.info(`${NAME} Connected to api: ${api.key}`)
         return api
-      } else {
-        opts.log.warn(
-          `${NAME} ${data.statusCode} We had problems accessing ${api.key} . Check path and keys if this issue persists. We will retry in ${opts.timeout}ms`
-        )
-        setTimeout(function () {
-          opts.log.info(`${NAME} Reconnecting to api: ${api.key}`)
-          connect(api, opts)
-        }, opts.timeout)
-        return api
       }
+      opts.log.warn(
+        `${NAME} ${data.statusCode} We had problems accessing ${api.key} . Check path and keys if this issue persists. We will retry in ${opts.timeout}ms`
+      )
+      setTimeout(() => {
+        opts.log.info(`${NAME} Reconnecting to api: ${api.key}`)
+        connect(api, opts)
+      }, opts.timeout)
+      return api
     })
     .catch(err => {
       opts.log.error(
-        { err: err },
+        { err },
         `${NAME} Failed to get API paths from API: ${api.key}, host: ${api.config.host}, proxyBasePath:  ${api.config.proxyBasePath}.`
       )
-      setTimeout(function () {
+      setTimeout(() => {
         opts.log.info(`${NAME} Reconnecting to api: ${api.key}`)
         connect(api, opts)
       }, opts.timeout)
@@ -219,8 +218,8 @@ function getRedisConfig(apiName, cache) {
  */
 function getRedisClient(apiName, opts) {
   return new Promise((resolve, reject) => {
-    let cache = opts.cache ? opts.cache : {}
-    let redis = opts.redis
+    const cache = opts.cache ? opts.cache : {}
+    const { redis } = opts
     try {
       if (cache[apiName]) {
         const cacheConfig = getRedisConfig(apiName, cache)

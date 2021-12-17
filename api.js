@@ -1,17 +1,19 @@
+/* eslint-disable func-names */
+/* eslint-disable no-use-before-define */
 /**
  * Class to handle json api calls
  * @type {*}
  */
 
-var Q = require('q')
+const Q = require('q')
 const { v4: uuidv4 } = require('uuid')
 const { fetchWrapper } = require('./fetchUtils')
 
 module.exports = (function () {
-  var MIME_JSON = 'application/json'
-  var MIME_TEXT = 'text/plain'
-  var HEADER_ACCEPT = 'accept'
-  var REQUEST_GUID = 'request-guid'
+  const MIME_JSON = 'application/json'
+  const MIME_TEXT = 'text/plain'
+  const HEADER_ACCEPT = 'accept'
+  const REQUEST_GUID = 'request-guid'
 
   /**
    * Wrap our constructor in a factory method.
@@ -40,7 +42,7 @@ module.exports = (function () {
    */
   function Api(apiOptions) {
     // default options
-    var options = defaultOptions(apiOptions)
+    const options = defaultOptions(apiOptions)
 
     this.debugMode = apiOptions.debugMode || false
 
@@ -56,8 +58,9 @@ module.exports = (function () {
     }
 
     this.debugPrint = function (msg) {
-      var self = this
+      const self = this
       if (self.debugMode) {
+        // eslint-disable-next-line no-console
         console.log(msg)
       }
     }
@@ -70,7 +73,7 @@ module.exports = (function () {
    * @param onError callback for then call fails, receives the error as a parameter
    */
   Api.prototype.getJson = function (onSuccess, onError) {
-    var self = this
+    const self = this
     self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_JSON
     self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuidv4()
     self.httpRequestSettings.method = 'GET'
@@ -85,7 +88,7 @@ module.exports = (function () {
    * @param onError callback for then call fails, receives the error as a parameter
    */
   Api.prototype.getText = function (onSuccess, onError) {
-    var self = this
+    const self = this
     self.json = false
     self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_TEXT
     self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuidv4()
@@ -102,7 +105,7 @@ module.exports = (function () {
    * @param onError callback for then call fails, receives the error as a parameter
    */
   Api.prototype.postJson = function (data, onSuccess, onError) {
-    var self = this
+    const self = this
     self.httpRequestSettings.json = true
     self.httpRequestSettings.method = 'POST'
     self.httpRequestSettings.body = data
@@ -118,7 +121,7 @@ module.exports = (function () {
    * @param onError callback for then call fails, receives the error as a parameter
    */
   Api.prototype.request = function (onSuccess, onError) {
-    var self = this
+    const self = this
 
     self.debugPrint('GET Request settings: ' + JSON.stringify(self.httpRequestSettings))
 
@@ -130,7 +133,7 @@ module.exports = (function () {
    * Sends a GET request to the configured api expecting a text/plain response
    */
   Api.prototype.promisedGetText = function () {
-    var self = this
+    const self = this
     self.json = false
     self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_TEXT
     self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuidv4()
@@ -147,17 +150,17 @@ module.exports = (function () {
    * @return promise for the api call
    */
   Api.prototype.promisedApiCall = function () {
-    var self = this
+    const self = this
 
-    var deferred = Q.defer()
+    const deferred = Q.defer()
 
     self.debugPrint('Deferred call: ' + JSON.stringify(self.httpRequestSettings))
 
     self.request(
-      function (data) {
+      data => {
         deferred.resolve(data) // fulfills the promise with `data` as the value
       },
-      function (err) {
+      err => {
         deferred.reject(err) // rejects the promise with `err` as the reason
       }
     )
@@ -170,7 +173,7 @@ module.exports = (function () {
    *
    */
   function defaultOptions(requestOptions) {
-    var options = requestOptions || {}
+    const options = requestOptions || {}
     // default options
     options.port = requestOptions.port
     options.method = requestOptions.method || 'GET'
@@ -219,7 +222,7 @@ module.exports = (function () {
    * build ther call uri
    */
   function buildRequestUri(options) {
-    var requestUri = 'http://'
+    let requestUri = 'http://'
     if (options.https) {
       requestUri = 'https://'
     }
@@ -240,8 +243,8 @@ module.exports = (function () {
   function normalizeHeaders(headers) {
     if (!headers || typeof headers !== 'object') return
 
-    var normalizedHeaders = {}
-    for (var name in headers) {
+    const normalizedHeaders = {}
+    for (const name in headers) {
       if (headers.hasOwnProperty(name)) {
         normalizedHeaders[name.toLowerCase()] = headers[name]
       }

@@ -1,3 +1,6 @@
+/* eslint-disable func-names */
+/* eslint-disable no-use-before-define */
+
 'use strict'
 
 const querystring = require('querystring')
@@ -65,7 +68,8 @@ function BasicAPI(options, base) {
 const isTimeoutError = e => {
   if (e.name === 'Error') {
     return e.toString().includes('TIMEDOUT')
-  } else if (typeof e === 'object') {
+  }
+  if (typeof e === 'object') {
     return JSON.stringify(e).includes('TIMEDOUT')
   }
 
@@ -76,8 +80,8 @@ const retryWrapper = (_this, cb, args) => {
   let counter = 0
   const requestGuid = typeof args[2] === 'object' ? args[2].requestGuid : undefined
 
-  const sendRequest = () => {
-    return cb.apply(_this, args).catch(e => {
+  const sendRequest = () =>
+    cb.apply(_this, args).catch(e => {
       if (isTimeoutError(e) && counter < _this._maxNumberOfRetries) {
         counter++
         const url = typeof args[2] === 'object' ? args[2].uri : args[2]
@@ -87,7 +91,8 @@ const retryWrapper = (_this, cb, args) => {
           )
         }
         return sendRequest()
-      } else if (isTimeoutError(e)) {
+      }
+      if (isTimeoutError(e)) {
         throw new Error(
           `The request with guid ${_this.lastRequestGuid} timed out after ${counter} retries. The connection to the API seems to be overloaded.`
         )
@@ -95,7 +100,6 @@ const retryWrapper = (_this, cb, args) => {
         throw e
       }
     })
-  }
 
   return sendRequest()
 }
@@ -250,7 +254,7 @@ BasicAPI.prototype.defaults = function (options) {
 }
 
 BasicAPI.prototype.resolve = function (uri, params) {
-  for (let key in params) {
+  for (const key in params) {
     if (params.hasOwnProperty(key)) {
       const value = params[key]
       uri = uri.replace(new RegExp(':' + key, 'gi'), encodeURIComponent(value))
@@ -335,23 +339,22 @@ function _exec(api, options, method, callback) {
     const redisMaybeFnc = typeof api._redis.client === 'function' ? api._redis.client() : api._redis.client
 
     Promise.resolve(redisMaybeFnc)
-      .then(client => {
-        return new Promise((resolve, reject) => {
-          client.get(key, (err, reply) => {
-            if (err || !reply) {
-              reject(err)
-            } else {
-              // TODO: Should we catch parse errors and return a reasonable message or
-              // is this good enough?
-              const value = JSON.parse(reply)
-              resolve(callback(null, value, value.body))
-            }
+      .then(
+        client =>
+          new Promise((resolve, reject) => {
+            client.get(key, (err, reply) => {
+              if (err || !reply) {
+                reject(err)
+              } else {
+                // TODO: Should we catch parse errors and return a reasonable message or
+                // is this good enough?
+                const value = JSON.parse(reply)
+                resolve(callback(null, value, value.body))
+              }
+            })
           })
-        })
-      })
-      .catch(() => {
-        return _makeRequest(api, options, method, callback)
-      })
+      )
+      .catch(() => _makeRequest(api, options, method, callback))
   } else {
     _makeRequest(api, options, method, callback)
   }
@@ -362,7 +365,7 @@ function _makeRequest(api, options, method, callback) {
 
   if (typeof options === 'string') {
     options = {
-      uri: uri,
+      uri,
       requestGuid: uuidv4(),
     }
   } else {
@@ -400,11 +403,11 @@ function _createPromiseCallback(resolve, reject) {
       reject(error)
     } else {
       resolve({
-        response: response,
+        response,
         statusCode: response.statusCode,
         statusMessage: response.statusMessage,
         headers: response.headers,
-        body: body,
+        body,
       })
     }
   }
@@ -413,7 +416,7 @@ function _createPromiseCallback(resolve, reject) {
 function _toBaseUrl(parts) {
   const protocol = parts.protocol || (parts.https ? 'https:' : 'http:')
   let host = parts.host || parts.hostname || 'localhost'
-  let port = parts.port
+  let { port } = parts
 
   if (!port) {
     const portIndex = host.lastIndexOf(':')
@@ -426,15 +429,15 @@ function _toBaseUrl(parts) {
 
   if (!port) {
     return url.format({
-      protocol: protocol,
-      host: host,
+      protocol,
+      host,
     })
   }
 
   return url.format({
-    protocol: protocol,
+    protocol,
     hostname: host,
-    port: port,
+    port,
   })
 }
 

@@ -1,8 +1,10 @@
+/* eslint-disable func-names */
+/* eslint-disable no-use-before-define */
 /**
  * Class to handle json api calls
  * @type {*}
  */
-var apiCaller = require('./api')
+const apiCaller = require('./api')
 
 module.exports = (function () {
   /**
@@ -43,8 +45,9 @@ module.exports = (function () {
     this.cache = options.cache
 
     this.debugPrint = function (msg) {
-      var self = this
+      const self = this
       if (self.debugMode) {
+        // eslint-disable-next-line no-console
         console.log(msg)
       }
     }
@@ -54,14 +57,12 @@ module.exports = (function () {
    * Sends a GET request to the configured api expecting a text/plain response
    */
   CachedApi.prototype.promisedGetText = function () {
-    var self = this
+    const self = this
     self.debugPrint('Calling promisedGetText for path: ' + self.key)
 
-    return readRedisCache(self).catch(function (err) {
+    return readRedisCache(self).catch(err => {
       self.debugPrint('Not found in cache[' + err + '], try data source: ' + self.key)
-      return self.api.promisedGetText().then(function (result) {
-        return storeInRedisAndReturnResult(self, result)
-      })
+      return self.api.promisedGetText().then(result => storeInRedisAndReturnResult(self, result))
     })
   }
 
@@ -73,22 +74,20 @@ module.exports = (function () {
    * @return Promise for the api call
    */
   CachedApi.prototype.promisedApiCall = function () {
-    var self = this
+    const self = this
     self.debugPrint('Calling promisedApiCall for path: ' + self.key)
 
     return readRedisCache(self)
-      .then(function (result) {
-        var jsonResult = result
+      .then(result => {
+        let jsonResult = result
         if (typeof result === 'string') {
           jsonResult = JSON.parse(result)
         }
         return jsonResult
       })
-      .catch(function (err) {
+      .catch(err => {
         self.debugPrint('Not found in cache[' + err + '], try data source: ' + self.key)
-        return self.api.promisedApiCall().then(function (result) {
-          return storeInRedisAndReturnResult(self, result)
-        })
+        return self.api.promisedApiCall().then(result => storeInRedisAndReturnResult(self, result))
       })
   }
 
@@ -101,7 +100,7 @@ module.exports = (function () {
 
   function storeInRedisAndReturnResult(self, result) {
     self.debugPrint('Store value in redis cache by: ' + self.key)
-    var value = result
+    let value = result
     if (typeof value === 'object') {
       value = JSON.stringify(result)
     }

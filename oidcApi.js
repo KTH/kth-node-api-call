@@ -1,12 +1,15 @@
+/* eslint-disable func-names */
+/* eslint-disable no-console */
+/* eslint-disable no-use-before-define */
 /**
  * Class to handle json api calls
  * @type {*}
  */
 
-var https = require('https')
-var http = require('http')
-var discovery = require('./discovery')
-var tokenCall = require('./tokenCall')
+const https = require('https')
+const http = require('http')
+const discovery = require('./discovery')
+const tokenCall = require('./tokenCall')
 
 module.exports = (function () {
   /**
@@ -36,7 +39,7 @@ module.exports = (function () {
 
   // Init the module instance
   Api.prototype.init = function (options, onSuccess, onError) {
-    var self = this
+    const self = this
 
     this.options = options || {}
     this.options.debugMode = options.debugMode || false
@@ -47,19 +50,19 @@ module.exports = (function () {
     this.options.loginUrl = options.loginUrl
 
     if (this.handleAuthentication) {
-      var discoveryService = discovery({
+      const discoveryService = discovery({
         host: this.options.oidcHost,
         path: this.options.oidcPath,
         port: this.options.oidcPort,
       })
 
       discoveryService.discovery(
-        function (discoveryData) {
+        discoveryData => {
           console.log('Discovery done')
           self.options.discoveryData = discoveryData
           onSuccess()
         },
-        function (err) {
+        err => {
           onError(err)
         }
       )
@@ -75,13 +78,13 @@ module.exports = (function () {
    * @param originalResponse
    */
   Api.prototype.request = function (onSuccess, onError, originalRequest, originalResponse) {
-    var self = this
+    const self = this
 
     if (originalRequest.user) {
-      self.requestOptions.headers['Authentication'] = 'Bearer ' + originalRequest.user
+      self.requestOptions.headers.Authentication = 'Bearer ' + originalRequest.user
     }
 
-    var requestOptions = {
+    const requestOptions = {
       host: self.requestOptions.host,
       port: self.requestOptions.port,
       path: self.requestOptions.path,
@@ -91,15 +94,15 @@ module.exports = (function () {
 
     self.debugPrint('Request settings: ' + JSON.stringify(requestOptions))
 
-    var protocol = self.options.https ? https : http
-    var apiRequest = protocol.request(
+    const protocol = self.options.https ? https : http
+    const apiRequest = protocol.request(
       requestOptions,
       _onResponse(onSuccess, onError, originalRequest, originalResponse, self)
     )
 
     apiRequest.end()
 
-    apiRequest.on('error', function (err) {
+    apiRequest.on('error', err => {
       if (onError != null) {
         onError(err)
       }
@@ -138,13 +141,13 @@ module.exports = (function () {
     onSuccess = onSuccess || function () {}
 
     return function (response) {
-      var responseData = ''
+      let responseData = ''
 
-      response.on('data', function (data) {
+      response.on('data', data => {
         responseData += data
       })
 
-      response.on('end', function () {
+      response.on('end', () => {
         self.debugPrint('Response from api: ' + responseData)
         _handleResponseFromApi(response, responseData, onSuccess, onError, originalRequest, originalResponse, self)
 
@@ -177,19 +180,19 @@ module.exports = (function () {
       case 412:
         // Precondition failed - token was missing but should exist for resource
         console.log('Precondition failed')
-        var TokenCall = tokenCall({
+        const TokenCall = tokenCall({
           clientKey: self.options.clientKey,
           clientSecret: self.options.clientSecret,
           tokenEndpoint: self.discoveryData.token_endpoint,
         })
 
         TokenCall.getClientToken(
-          function (token) {
+          token => {
             console.log('Got client token')
-            self.headers['Authentication'] = 'Bearer ' + token
+            self.headers.Authentication = 'Bearer ' + token
             self.request(onSuccess, onError)
           },
-          function (err) {
+          err => {
             onError({
               error: '500 - Internal server error. Error while fetching client access token: ' + err,
             })

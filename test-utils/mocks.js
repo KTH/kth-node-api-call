@@ -13,5 +13,5 @@ function listAllMockupCalls(input) {
 }
 
 module.exports = {
-  listMockupCalls,
+  listMockupCalls: listAllMockupCalls,
 }

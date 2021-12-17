@@ -1,5 +1,6 @@
-var api = require('./api')
-var url = require('url')
+/* eslint-disable func-names */
+const url = require('url')
+const api = require('./api')
 
 module.exports = (function () {
   function factory(options) {
@@ -14,8 +15,8 @@ module.exports = (function () {
   }
 
   TokenCall.prototype.getClientToken = function (onSuccess, onError) {
-    var parsedTokenUrl = url.parse(this.options.tokenEndpoint)
-    var TokenApi = api({
+    const parsedTokenUrl = url.parse(this.options.tokenEndpoint)
+    const TokenApi = api({
       host: parsedTokenUrl.host,
       port: parsedTokenUrl.port,
       path: parsedTokenUrl.path,
