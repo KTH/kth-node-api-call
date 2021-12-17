@@ -1,5 +1,5 @@
 {
-  "name": "kth-node-api-call",
+  "name": "@kth/api-call",
   "version": "4.0.0",
   "description": "Node.js module to make JSON calls against APIs.",
   "main": "index.js",

@@ -6,7 +6,7 @@
 const urlJoin = require('url-join')
 const BasicAPI = require('./basic')
 
-const NAME = 'kth-node-api-call'
+const NAME = '@kth/api-call'
 
 // default logger if none is provided in the opts object to _setup
 const defaultLog = {}

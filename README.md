@@ -1,13 +1,15 @@
-# KTH Node API Call [![Build Status](https://travis-ci.org/kth/kth-node-api-call.svg?branch=master)](https://travis-ci.org/kth/kth-node-api-call)
+# KTH API Call for Node
 
-# Overview
+[![Build Status](https://travis-ci.org/kth/kth-node-api-call.svg?branch=master)](https://travis-ci.org/kth/kth-node-api-call)
 
-Node module used to make JSON calls against APIs. 
+## Overview
+
+Node module used to make JSON calls against APIs. (Previously named `kth-node-api-call`.)
 
 To use in your node project, run:
 
 ```sh
-npm i kth-node-api-call
+npm i @kth/api-call
 ```
 
 ## Setup
@@ -15,7 +17,7 @@ npm i kth-node-api-call
 In your init callback to the Express web server, this should happen:
 
 ```javascript
-const connections = require('kth-node-api-call').Connections
+const connections = require('@kth/api-call').Connections
 
 const nodeApi = {
   namedApi: {
