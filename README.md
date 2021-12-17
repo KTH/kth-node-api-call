@@ -4,7 +4,7 @@
 
 ## Overview
 
-Node module used to make JSON calls against APIs. (Previously named `kth-node-api-call`.)
+Node module used to make JSON calls against APIs. (Previously published as `kth-node-api-call`, now `@kth/api-call`.)
 
 To use in your node project, run:
 
