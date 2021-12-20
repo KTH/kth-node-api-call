@@ -70,7 +70,8 @@
     "verbose": true,
     "coveragePathIgnorePatterns": [
       "/node_modules/",
-      "/test-utils/"
+      "/test-utils/",
+      "/test/mock-api/"
     ]
   }
 }
