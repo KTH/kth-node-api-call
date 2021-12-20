@@ -63,10 +63,9 @@ describe('basic calls works as expected', () => {
       done()
     })
   })
-  xit('performs a successful head request when calling head', done => {
+  it('performs a successful head request when calling head', done => {
     api.head('/method', (error, response, body) => {
-      console.log(`response: ${response}, body: ${body}`)
-      expect(body.method).toBe('head')
+      expect(body).toBeUndefined()
       expect(response.statusCode).toBe(200)
       done()
     })
@@ -97,9 +96,9 @@ describe('basic calls works as expected', () => {
     expect(result.body.method).toBe('patch')
     expect(result.statusCode).toBe(200)
   })
-  xit('performs a successful head request when calling headAsync', async () => {
+  it('performs a successful head request when calling headAsync', async () => {
     const result = await api.headAsync('/method')
-    expect(result.body).toBe(null)
+    expect(result.body).toBeUndefined()
     expect(result.statusCode).toBe(200)
   })
   afterAll(async () => {

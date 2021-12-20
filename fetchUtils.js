@@ -29,7 +29,7 @@ function _createFetchWrapper(wrapperOptions, method) {
 
     try {
       const response = await fetch(target, opts)
-      const responseBody = await _parseResponseBody(response, json)
+      const responseBody = method === 'HEAD' ? undefined : await _parseResponseBody(response, json)
       response.statusCode = response.status
       callback(null, response, responseBody)
     } catch (error) {
