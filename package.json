@@ -15,7 +15,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "test": "mocha tests/** --exit && jest",
+    "test": "jest",
     "jest": "jest",
     "jest:watch": "jest --watch",
     "jest:watch-update": "jest --watch -u",
@@ -44,7 +44,6 @@
     "husky": "^7.0.1",
     "jest": "^27.0.6",
     "jest-extended": "^1.2.0",
-    "mocha": "^9.0.3",
     "nock": "^13.1.1",
     "prettier": "^2.3.2",
     "pretty-quick": "^3.1.1",
