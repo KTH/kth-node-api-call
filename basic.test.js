@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
 const BasicAPI = require('./basic')
-const apiserver = require('./test/mock-api/server')
+require('./test/mock-api/server')
 
 const logConsole = false
 const mockLogger = {
@@ -101,7 +101,7 @@ describe('basic calls works as expected', () => {
     expect(result.body).toBeUndefined()
     expect(result.statusCode).toBe(200)
   })
-  xit('should retry on timeout', async () => {
+  it('should retry on timeout', async () => {
     api._request.post = jest.fn().mockImplementation(async (options, callback) => {
       callback(new Error('ESOCKETTIMEDOUT'))
     })
