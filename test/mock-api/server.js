@@ -3,17 +3,21 @@
 'use strict'
 
 const express = require('express')
+const bodyParser = require('body-parser')
 const { GracefulShutdownManager } = require('@moebius/http-graceful-shutdown')
 const config = require('./config')
 
 const app = express()
+
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
+
 config.paths.forEach(path => {
   // console.log('Added path', path.url)
   app[path.method](path.url, (req, res) => {
     // console.log('Responded on path', path.url)
-    if (path.response) {
-      res.status(path.response.statusCode).send(path.response.body)
-    } else res.destroy(null)
+    const { statusCode, body } = path.response(req, res)
+    res.status(statusCode).send(body)
   })
 })
 

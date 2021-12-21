@@ -36,8 +36,8 @@ describe('basic calls works as expected', () => {
     })
   })
   it('performs a successful post request when calling post', done => {
-    api.post('/method', (error, response, body) => {
-      expect(body.method).toBe('post')
+    api.post({ uri: '/method', body: { test: true } }, (error, response, body) => {
+      expect(body).toStrictEqual({ postdata: { test: true }, method: 'post' })
       expect(response.statusCode).toBe(200)
       done()
     })
@@ -77,8 +77,8 @@ describe('basic calls works as expected', () => {
     expect(result.statusCode).toBe(200)
   })
   it('performs a successful post request when calling postAsync', async () => {
-    const result = await api.postAsync('/method')
-    expect(result.body.method).toBe('post')
+    const result = await api.postAsync({ uri: '/method', body: { test: true } })
+    expect(result.body).toStrictEqual({ postdata: { test: true }, method: 'post' })
     expect(result.statusCode).toBe(200)
   })
   it('performs a successful put request when calling putAsync', async () => {

@@ -7,7 +7,7 @@ module.exports = {
     {
       method: 'get',
       url: '/api/test/_paths',
-      response: {
+      response: () => ({
         statusCode: 200,
         body: {
           path1: {
@@ -20,43 +20,49 @@ module.exports = {
             },
           },
         },
-      },
+      }),
     },
 
     {
       method: 'get',
       url: '/api/test/_checkAPIkey',
-      response: { statusCode: 200, body: {} },
+      response: () => ({ statusCode: 200, body: {} }),
     },
     {
       method: 'get',
       url: '/api/test/method',
-      response: { statusCode: 200, body: { method: 'get' } },
+      response: req => ({
+        statusCode: 200,
+        body: { method: 'get', query: req.query },
+      }),
     },
     {
       method: 'post',
       url: '/api/test/method',
-      response: { statusCode: 200, body: { method: 'post' } },
+      response: req => ({
+        statusCode: 200,
+        body: { method: 'post', postdata: req.body },
+      }),
     },
     {
       method: 'put',
       url: '/api/test/method',
-      response: { statusCode: 200, body: { method: 'put' } },
+      response: req => ({ statusCode: 200, body: { method: 'put', putdata: req.body } }),
     },
     {
       method: 'delete',
       url: '/api/test/method',
-      response: { statusCode: 200, body: { method: 'del' } },
+      response: () => ({ statusCode: 200, body: { method: 'del' } }),
     },
     {
       method: 'head',
       url: '/api/test/method',
-      response: { statusCode: 200, body: null },
+      response: () => ({ statusCode: 200, body: null }),
     },
     {
       method: 'patch',
       url: '/api/test/method',
-      response: { statusCode: 200, body: { method: 'patch' } },
+      response: () => ({ statusCode: 200, body: { method: 'patch' } }),
     },
   ],
 }
