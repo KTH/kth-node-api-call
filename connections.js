@@ -1,6 +1,3 @@
-/* eslint-disable func-names */
-/* eslint-disable no-use-before-define */
-
 'use strict'
 
 const urlJoin = require('url-join')
@@ -9,91 +6,9 @@ const BasicAPI = require('./basic')
 const NAME = '@kth/api-call'
 
 // default logger if none is provided in the opts object to _setup
-const defaultLog = {}
 // eslint-disable-next-line no-console
-defaultLog.error = defaultLog.info = defaultLog.debug = defaultLog.warn = console.log
+const defaultLog = { error: console.log, info: console.log, debug: console.log, warn: console.log }
 const defaultTimeout = 30000
-
-module.exports = {
-  setup,
-}
-
-// populate an object with all api configurations and paths
-function setup(apisConfig, apisKeyConfig, opts) {
-  if (!apisConfig || typeof apisConfig !== 'object') {
-    throw new Error(`${NAME} Apis config is required.`)
-  }
-  if (!apisKeyConfig) apisKeyConfig = {}
-  if (!opts) opts = {}
-  if (!opts.log) opts.log = defaultLog
-  if (!opts.timeout) opts.timeout = defaultTimeout
-  const output = {}
-
-  const apis = createApis(apisConfig, apisKeyConfig, opts)
-
-  const connectedApis = apis
-    .filter(api => api.paths)
-    .map(api => {
-      api.connected = true
-      return Promise.resolve(api)
-    })
-
-  const apisWithoutPaths = apis.filter(api => !api.paths)
-  const remoteConnectedApis = getPathsRemote(apisWithoutPaths, opts)
-
-  const allConnectedApis = Promise.all(remoteConnectedApis.concat(connectedApis))
-
-  allConnectedApis
-    .then(connectedApis => {
-      connectedApis.forEach(connectedApi => {
-        if (connectedApi) {
-          if (opts.checkAPIs) {
-            checkAPI(connectedApi, opts.log)
-          }
-          configureApiCache(connectedApi, opts)
-          output[connectedApi.key] = connectedApi
-        }
-      })
-      opts.log.info(`${NAME} API setup done. ${JSON.stringify(connectedApis)}`)
-    })
-    .catch(err => {
-      opts.log.error(`${NAME} API setup failed: ${err.stack} `)
-      process.exit(1)
-    })
-
-  return output
-}
-
-// check API key and kill if api is required
-function checkAPI(api, log) {
-  const { config } = api
-  const apiName = api.key
-
-  const statusCheckPath = api.config.statusCheckPath || '_checkAPIkey'
-  const uri = urlJoin(config.proxyBasePath, statusCheckPath)
-  api.client
-    .getAsync({ uri })
-    .then(res => {
-      if (config.useApiKey !== false) {
-        if (res.statusCode === 401) {
-          throw new Error(`${NAME} Bad API key for ${apiName}`)
-        } else if (res.statusCode === 404) {
-          throw new Error(`${NAME} Check API functionality not implemented on ${apiName}`)
-        } else if (res.statusCode === 500) {
-          throw new Error(`${NAME} Got 500 response on checkAPI call, most likely a bad API key for  ${apiName}`)
-        }
-      } else if (res.statusCode < 200 || res.statusCode >= 300) {
-        throw new Error(`${NAME} API check failed for ${apiName}, got status ${res.statusCode}`)
-      }
-    })
-    .catch(err => {
-      log.error(`${NAME} Error while checking API: ${err.message}`)
-      if (config.required) {
-        log.error(`${NAME} Required API call failed, EXITING`)
-        process.exit(1)
-      }
-    })
-}
 
 // unpack nodeApi:s and pair with keys, returns BasicAPI objects
 function createApis(apisConfig, apisKeyConfig, apiOpts) {
@@ -131,12 +46,6 @@ function createApis(apisConfig, apisKeyConfig, apiOpts) {
 
     return api
   })
-}
-
-// retrieve paths from remote /_paths endpoint
-function getPathsRemote(apis, opts) {
-  const connectedApiPromises = apis.map(api => connect(api, opts))
-  return connectedApiPromises
 }
 
 // get all api-paths from the /_paths endpoint
@@ -179,26 +88,41 @@ function connect(api, opts) {
     })
 }
 
-// configure caching if specified in opts object
-function configureApiCache(connectedApi, opts) {
-  const apiName = connectedApi.key
-  if (getRedisConfig(apiName, opts.cache)) {
-    getRedisClient(apiName, opts)
-      .then(getRedisClientFnc => {
-        connectedApi.client._hasRedis = true
-        connectedApi.client._redis = {
-          prefix: apiName,
-          client: getRedisClientFnc,
-          expire: getRedisConfig(apiName, opts.cache).expireTime,
+// retrieve paths from remote /_paths endpoint
+function getPathsRemote(apis, opts) {
+  const connectedApiPromises = apis.map(api => connect(api, opts))
+  return connectedApiPromises
+}
+
+// check API key and kill if api is required
+function checkAPI(api, log) {
+  const { config } = api
+  const apiName = api.key
+
+  const statusCheckPath = api.config.statusCheckPath || '_checkAPIkey'
+  const uri = urlJoin(config.proxyBasePath, statusCheckPath)
+  api.client
+    .getAsync({ uri })
+    .then(res => {
+      if (config.useApiKey !== false) {
+        if (res.statusCode === 401) {
+          throw new Error(`${NAME} Bad API key for ${apiName}`)
+        } else if (res.statusCode === 404) {
+          throw new Error(`${NAME} Check API functionality not implemented on ${apiName}`)
+        } else if (res.statusCode === 500) {
+          throw new Error(`${NAME} Got 500 response on checkAPI call, most likely a bad API key for  ${apiName}`)
         }
-      })
-      .catch(err => {
-        opts.log.error('Unable to create redisClient', { error: err })
-        connectedApi.client._hasRedis = false
-      })
-    opts.log.debug(`API configured to use redis cache: ${apiName}`)
-  }
-  return connectedApi
+      } else if (res.statusCode < 200 || res.statusCode >= 300) {
+        throw new Error(`${NAME} API check failed for ${apiName}, got status ${res.statusCode}`)
+      }
+    })
+    .catch(err => {
+      log.error(`${NAME} Error while checking API: ${err.message}`)
+      if (config.required) {
+        log.error(`${NAME} Required API call failed, EXITING`)
+        process.exit(1)
+      }
+    })
 }
 
 /*
@@ -230,4 +154,76 @@ function getRedisClient(apiName, opts) {
       reject(err)
     }
   })
+}
+
+// configure caching if specified in opts object
+function configureApiCache(connectedApi, opts) {
+  const apiName = connectedApi.key
+  if (getRedisConfig(apiName, opts.cache)) {
+    getRedisClient(apiName, opts)
+      .then(getRedisClientFnc => {
+        connectedApi.client._hasRedis = true
+        connectedApi.client._redis = {
+          prefix: apiName,
+          client: getRedisClientFnc,
+          expire: getRedisConfig(apiName, opts.cache).expireTime,
+        }
+      })
+      .catch(err => {
+        opts.log.error('Unable to create redisClient', { error: err })
+        connectedApi.client._hasRedis = false
+      })
+    opts.log.debug(`API configured to use redis cache: ${apiName}`)
+  }
+  return connectedApi
+}
+
+// populate an object with all api configurations and paths
+function setup(apisConfig, apisKeyConfig, opts) {
+  if (!apisConfig || typeof apisConfig !== 'object') {
+    throw new Error(`${NAME} Apis config is required.`)
+  }
+  const myApisKeyConfig = { ...apisKeyConfig } || {}
+  if (!opts) opts = {}
+  if (!opts.log) opts.log = defaultLog
+  if (!opts.timeout) opts.timeout = defaultTimeout
+  const output = {}
+
+  const apis = createApis(apisConfig, myApisKeyConfig, opts)
+
+  const connectedApis = apis
+    .filter(api => api.paths)
+    .map(api => {
+      api.connected = true
+      return Promise.resolve(api)
+    })
+
+  const apisWithoutPaths = apis.filter(api => !api.paths)
+  const remoteConnectedApis = getPathsRemote(apisWithoutPaths, opts)
+
+  const allConnectedApis = Promise.all(remoteConnectedApis.concat(connectedApis))
+
+  allConnectedApis
+    .then(connApis => {
+      connApis.forEach(connApi => {
+        if (connApi) {
+          if (opts.checkAPIs) {
+            checkAPI(connApi, opts.log)
+          }
+          configureApiCache(connApi, opts)
+          output[connApi.key] = connApi
+        }
+      })
+      opts.log.info(`${NAME} API setup done. ${JSON.stringify(connApis)}`)
+    })
+    .catch(err => {
+      opts.log.error(`${NAME} API setup failed: ${err.stack} `)
+      process.exit(1)
+    })
+
+  return output
+}
+
+module.exports = {
+  setup,
 }
