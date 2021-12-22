@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
 const fetch = require('node-fetch')
 
+const FormData = require('form-data')
+
 const MIME_JSON = 'application/json'
 const HEADER_CONTENT_LENGTH = 'content-length'
 const HEADER_CONTENT_TYPE = 'content-type'
@@ -13,16 +15,36 @@ async function _parseResponseBody(response, json) {
   }
   return json ? response.json() : response.text()
 }
+function buildFormData(data) {
+  const form = new FormData()
+
+  for (const key in data) {
+    if (key === 'file') {
+      form.append(key, data[key].value, data[key].options)
+    } else {
+      form.append(key, data[key])
+    }
+  }
+  return form
+}
 
 function _createFetchWrapper(wrapperOptions, method) {
   const { baseUrl = '', headers = {}, json = true } = wrapperOptions
   return async (options, callback) => {
-    const { uri, ...opts } = options
+    const { uri } = options
 
     const target = `${baseUrl}${uri}`
-    opts.method = method
-    opts.headers = { ...headers, ...opts.headers }
-    if (json) {
+    let opts
+    if (options.formData) {
+      opts = {}
+      opts.method = method
+      const form = buildFormData(options.formData)
+      opts.body = form
+      opts.headers = { ...headers, ...options.headers, ...form.getHeaders() }
+    } else if (json) {
+      opts = { ...options }
+      opts.method = method
+      opts.headers = { ...headers, ...options.headers }
       opts.headers[HEADER_CONTENT_TYPE] = MIME_JSON
       opts.body = JSON.stringify(opts.body)
     }
