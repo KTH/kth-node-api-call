@@ -3,12 +3,14 @@
 'use strict'
 
 const express = require('express')
+const formData = require('express-form-data')
 const bodyParser = require('body-parser')
 const { GracefulShutdownManager } = require('@moebius/http-graceful-shutdown')
 const config = require('./config')
 
 const app = express()
 
+app.use(formData.parse())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 

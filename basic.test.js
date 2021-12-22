@@ -18,7 +18,6 @@ const opts = {
   https: false,
   json: true,
   defaultTimeout: 50,
-  headers: { 'Content-Type': 'application/json' },
   retryOnESOCKETTIMEDOUT: true,
   maxNumberOfRetries: 2,
   basePath: '/api/test',
@@ -42,6 +41,15 @@ describe('basic calls works as expected', () => {
       done()
     })
   })
+
+  it('performs a successful post request with formData when calling post', done => {
+    api.post({ uri: '/method', formData: { test: 'formData' } }, (error, response, body) => {
+      expect(body).toStrictEqual({ postdata: { test: 'formData' }, method: 'post' })
+      expect(response.statusCode).toBe(200)
+      done()
+    })
+  })
+
   it('performs a successful put request when calling put', done => {
     api.put('/method', (error, response, body) => {
       expect(body.method).toBe('put')
@@ -79,6 +87,11 @@ describe('basic calls works as expected', () => {
   it('performs a successful post request when calling postAsync', async () => {
     const result = await api.postAsync({ uri: '/method', body: { test: true } })
     expect(result.body).toStrictEqual({ postdata: { test: true }, method: 'post' })
+    expect(result.statusCode).toBe(200)
+  })
+  it('performs a successful post request with formData when calling postAsync', async () => {
+    const result = await api.postAsync({ uri: '/method', formData: { test: 'formData' } })
+    expect(result.body).toStrictEqual({ postdata: { test: 'formData' }, method: 'post' })
     expect(result.statusCode).toBe(200)
   })
   it('performs a successful put request when calling putAsync', async () => {
