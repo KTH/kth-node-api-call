@@ -52,8 +52,7 @@ function createApis(apisConfig, apisKeyConfig, apiOpts) {
 function connect(api, opts) {
   // Allow connecting to non node-api servers
   if (api.config.doNotCallPathsEndpoint) {
-    api.connected = true
-    return Promise.resolve(api)
+    return Promise.resolve({ ...api, connected: true })
   }
 
   const uri = `${api.config.proxyBasePath}/_paths` // get the proxyBasePath eg. api/publications
@@ -183,23 +182,16 @@ function setup(apisConfig, apisKeyConfig, opts) {
   if (!apisConfig || typeof apisConfig !== 'object') {
     throw new Error(`${NAME} Apis config is required.`)
   }
-  const myApisKeyConfig = { ...apisKeyConfig } || {}
-  if (!opts) opts = {}
-  if (!opts.log) opts.log = defaultLog
-  if (!opts.timeout) opts.timeout = defaultTimeout
+  const myApisKeyConfig = { ...apisKeyConfig }
+  const myOpts = { log: defaultLog, timeout: defaultTimeout, ...opts }
   const output = {}
 
-  const apis = createApis(apisConfig, myApisKeyConfig, opts)
+  const apis = createApis(apisConfig, myApisKeyConfig, myOpts)
 
-  const connectedApis = apis
-    .filter(api => api.paths)
-    .map(api => {
-      api.connected = true
-      return Promise.resolve(api)
-    })
+  const connectedApis = apis.filter(api => api.paths).map(api => Promise.resolve({ ...api, connected: true }))
 
   const apisWithoutPaths = apis.filter(api => !api.paths)
-  const remoteConnectedApis = getPathsRemote(apisWithoutPaths, opts)
+  const remoteConnectedApis = getPathsRemote(apisWithoutPaths, myOpts)
 
   const allConnectedApis = Promise.all(remoteConnectedApis.concat(connectedApis))
 
@@ -207,17 +199,17 @@ function setup(apisConfig, apisKeyConfig, opts) {
     .then(connApis => {
       connApis.forEach(connApi => {
         if (connApi) {
-          if (opts.checkAPIs) {
-            checkAPI(connApi, opts.log)
+          if (myOpts.checkAPIs) {
+            checkAPI(connApi, myOpts.log)
           }
-          configureApiCache(connApi, opts)
+          configureApiCache(connApi, myOpts)
           output[connApi.key] = connApi
         }
       })
-      opts.log.info(`${NAME} API setup done. ${JSON.stringify(connApis)}`)
+      myOpts.log.info(`${NAME} API setup done. ${JSON.stringify(connApis)}`)
     })
     .catch(err => {
-      opts.log.error(`${NAME} API setup failed: ${err.stack} `)
+      myOpts.log.error(`${NAME} API setup failed: ${err.stack} `)
       process.exit(1)
     })
 
