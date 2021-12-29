@@ -20,7 +20,7 @@
     "jest:watch": "jest --watch",
     "jest:watch-update": "jest --watch -u",
     "build": "./build.sh",
-    "prepare": "bash -c 'if [ -f ./node_modules/.bin/husky ]; then husky install; fi'",
+    "prepare": "if [ -f ./node_modules/.bin/husky ]; then husky install; fi",
     "prettier:all": "prettier --write \"**/*.js\""
   },
   "keywords": [
