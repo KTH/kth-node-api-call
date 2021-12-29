@@ -241,7 +241,7 @@ module.exports = (function () {
    * normalize headers, i.e. lower case all header names.
    */
   function normalizeHeaders(headers) {
-    if (!headers || typeof headers !== 'object') return
+    if (!headers || typeof headers !== 'object') return {}
 
     const normalizedHeaders = {}
     for (const name in headers) {

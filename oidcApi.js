@@ -137,8 +137,8 @@ module.exports = (function () {
    * @private
    */
   function _onResponse(onSuccess, onError, originalRequest, originalResponse, self) {
-    onError = onError || function () {}
-    onSuccess = onSuccess || function () {}
+    const err = onError || function () {}
+    const succ = onSuccess || function () {}
 
     return function (response) {
       let responseData = ''
@@ -149,7 +149,7 @@ module.exports = (function () {
 
       response.on('end', () => {
         self.debugPrint('Response from api: ' + responseData)
-        _handleResponseFromApi(response, responseData, onSuccess, onError, originalRequest, originalResponse, self)
+        _handleResponseFromApi(response, responseData, succ, err, originalRequest, originalResponse, self)
 
         /*        var json
          try {

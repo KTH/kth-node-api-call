@@ -3,10 +3,6 @@ const url = require('url')
 const api = require('./api')
 
 module.exports = (function () {
-  function factory(options) {
-    return new TokenCall(options)
-  }
-
   function TokenCall(options) {
     this.options = options || {}
     this.options.tokenEndpoint = options.tokenEndpoint
@@ -14,6 +10,9 @@ module.exports = (function () {
     this.options.clientSecret = options.clientSecret
   }
 
+  function factory(options) {
+    return new TokenCall(options)
+  }
   TokenCall.prototype.getClientToken = function (onSuccess, onError) {
     const parsedTokenUrl = url.parse(this.options.tokenEndpoint)
     const TokenApi = api({
