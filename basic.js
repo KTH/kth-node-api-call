@@ -78,16 +78,15 @@ const isTimeoutError = e => {
 
 const retryWrapper = (_this, cb, args) => {
   let counter = 0
-  const requestGuid = typeof args[2] === 'object' ? args[2].requestGuid : undefined
 
   const sendRequest = () =>
     cb.apply(_this, args).catch(e => {
       if (isTimeoutError(e) && counter < _this._maxNumberOfRetries) {
         counter++
-        const url = typeof args[2] === 'object' ? args[2].uri : args[2]
+        const myUrl = typeof args[2] === 'object' ? args[2].uri : args[2]
         if (_this._log) {
           _this._log.warn(
-            `Request with guid ${_this.lastRequestGuid} to "${url}" failed, Retry ${counter}/${_this._maxNumberOfRetries}`
+            `Request with guid ${_this.lastRequestGuid} to "${myUrl}" failed, Retry ${counter}/${_this._maxNumberOfRetries}`
           )
         }
         return sendRequest()
@@ -254,14 +253,15 @@ BasicAPI.prototype.defaults = function (options) {
 }
 
 BasicAPI.prototype.resolve = function (uri, params) {
+  let myUri = uri
   for (const key in params) {
     if (params.hasOwnProperty(key)) {
       const value = params[key]
-      uri = uri.replace(new RegExp(':' + key, 'gi'), encodeURIComponent(value))
+      myUri = uri.replace(new RegExp(':' + key, 'gi'), encodeURIComponent(value))
     }
   }
 
-  return uri
+  return myUri
 }
 
 // <editor-fold desc="Helper functions">
@@ -292,15 +292,15 @@ function _getURI(api, options) {
 }
 
 function _wrapCallback(api, options, method, callback) {
-  return (err, res, body) => {
-    if (err) {
-      callback(err, res, body)
+  return (error, result, body) => {
+    if (error) {
+      callback(error, result, body)
       return
     }
 
-    if (api._hasRedis && res.statusCode >= 200 && res.statusCode < 400) {
+    if (api._hasRedis && result.statusCode >= 200 && result.statusCode < 400) {
       const key = _getKey(api, options, method)
-      const value = JSON.stringify(res)
+      const value = JSON.stringify(result)
 
       let redisMaybeFnc = api._redis.client
       if (typeof api._redis.client === 'function') {
@@ -328,7 +328,7 @@ function _wrapCallback(api, options, method, callback) {
         })
     }
 
-    callback(err, res, body)
+    callback(error, result, body)
   }
 }
 
@@ -362,38 +362,33 @@ function _exec(api, options, method, callback) {
 
 function _makeRequest(api, options, method, callback) {
   const uri = _getURI(api, options)
-
+  let opts
   if (typeof options === 'string') {
-    options = {
+    opts = {
       uri,
       requestGuid: uuidv4(),
+      headers: {},
     }
   } else {
-    options.uri = uri
-    options.requestGuid = options.requestGuid || uuidv4()
+    opts = { headers: {}, requestGuid: uuidv4(), ...options, uri }
   }
-  if (!options.headers) {
-    options.headers = {}
-  }
-  options.headers[REQUEST_GUID] = options.requestGuid
-  api.lastRequestGuid = options.requestGuid
-  callback = _wrapCallback(api, options, method, callback)
-  return api._request[method](options, callback)
+  opts.headers[REQUEST_GUID] = opts.requestGuid
+  api.lastRequestGuid = opts.requestGuid
+  const cb = _wrapCallback(api, opts, method, callback)
+  return api._request[method](opts, cb)
 }
 
 function _createPromise(api, func, options) {
   // Create a options object so we can add default timeout
+  let opt
   if (typeof options !== 'object') {
-    options = { uri: options }
-  }
-
-  // If no timeout was set on this specific call we add default timeout
-  if (!options.timeout) {
-    options.timeout = api._defaultTimeout
+    opt = { timeout: api._defaultTimeout, uri: options }
+  } else {
+    opt = { timeout: api._defaultTimeout, ...options }
   }
 
   return new Promise((resolve, reject) => {
-    func.call(api, options, _createPromiseCallback(resolve, reject))
+    func.call(api, opt, _createPromiseCallback(resolve, reject))
   })
 }
 
