@@ -75,7 +75,7 @@ module.exports = (function () {
   Api.prototype.getJson = function (onSuccess, onError) {
     const self = this
     self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_JSON
-    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuidv4()
+    self.httpRequestSettings.headers[REQUEST_GUID] = uuidv4()
     self.httpRequestSettings.method = 'GET'
 
     self.request(onSuccess, onError)
@@ -91,7 +91,7 @@ module.exports = (function () {
     const self = this
     self.json = false
     self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_TEXT
-    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuidv4()
+    self.httpRequestSettings.headers[REQUEST_GUID] = uuidv4()
     self.httpRequestSettings.method = 'GET'
 
     self.request(onSuccess, onError)
@@ -109,7 +109,7 @@ module.exports = (function () {
     self.httpRequestSettings.json = true
     self.httpRequestSettings.method = 'POST'
     self.httpRequestSettings.body = data
-    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuidv4()
+    self.httpRequestSettings.headers[REQUEST_GUID] = uuidv4()
 
     self.request(onSuccess, onError)
   }
@@ -136,7 +136,7 @@ module.exports = (function () {
     const self = this
     self.json = false
     self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_TEXT
-    self.httpRequestSettings.headers[REQUEST_GUID] = options.requestGuid || uuidv4()
+    self.httpRequestSettings.headers[REQUEST_GUID] = uuidv4()
     self.httpRequestSettings.method = 'GET'
 
     return self.promisedApiCall()
@@ -199,20 +199,20 @@ module.exports = (function () {
    */
   function handleResponse(self, onSuccess, onError) {
     return function (error, response, body) {
-      onError = onError || function () {}
-      onSuccess = onSuccess || function () {}
+      const errFunc = onError || function () {}
+      const succFunc = onSuccess || function () {}
       if (error) {
-        onError(error)
+        errFunc(error)
         self.debugPrint('Error: ' + error)
       } else {
         // if status code is bad, return an error
         if (response.statusCode >= 400) {
-          return onError({
+          return errFunc({
             statusCode: response.statusCode,
             body: response.body,
           })
         }
-        onSuccess(body)
+        succFunc(body)
         self.debugPrint('Response: ' + response.statusCode, body)
       }
     }
