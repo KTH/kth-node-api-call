@@ -162,7 +162,8 @@ function _wrapCallback(api, options, method, callback) {
 
     if (api._hasRedis && result.statusCode >= 200 && result.statusCode < 400) {
       const key = _getKey(api, options, method)
-      const value = JSON.stringify(result)
+      const redisData = { ...result, body }
+      const value = JSON.stringify(redisData)
 
       let redisMaybeFnc = api._redis.client
       if (typeof api._redis.client === 'function') {
