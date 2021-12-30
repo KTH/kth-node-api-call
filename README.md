@@ -40,7 +40,7 @@ const cacheConfig = {
 }
 
 const apiKey = {
-  namedApi; '1234'
+  namedApi: '1234'
 }
 
 const options = {
