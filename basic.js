@@ -422,7 +422,7 @@ BasicAPI.prototype.resolve = function (uri, params) {
   for (const key in params) {
     if (Object.prototype.hasOwnProperty.call(params, key)) {
       const value = params[key]
-      myUri = uri.replace(new RegExp(':' + key, 'gi'), encodeURIComponent(value))
+      myUri = myUri.replace(new RegExp(':' + key, 'gi'), encodeURIComponent(value))
     }
   }
 
