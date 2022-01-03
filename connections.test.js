@@ -45,12 +45,7 @@ const apicall = uri => {
   const myUri = uri.uri ? uri.uri : uri
   return new Promise((resolve, reject) => {
     if (paths[myUri]) {
-      const answer = paths[myUri].shift()
-      if (answer.answerTimeout)
-        throw new Error(
-          `The request with guid XXX timed out after ${this._maxNumberOfRetries} retries. The connection to the API seems to be overloaded.`
-        )
-      else resolve(answer)
+      resolve(paths[myUri].shift())
     } else {
       reject(new Error('Path ' + myUri + ' not found.'))
     }
@@ -154,17 +149,6 @@ describe('Testing connection', () => {
     const output = connections.setup(mockApiConfig, mockApiKeyConfig, opts)
     setTimeout(() => {
       expect(output.testApi.connected).toBeTrue()
-      expect(process.exit).not.toBeCalled()
-      done()
-    }, 500) // wait for setup to finish
-  })
-
-  xit('should not be connected if unable to retreive paths', done => {
-    paths['/api/test/_checkAPIkey'] = [{ statusCode: 200, body: {} }]
-    paths['/api/test/_paths'] = [{ answerTimeout: true }, { statusCode: 404, body: {} }]
-    const output = connections.setup(mockApiConfig, mockApiKeyConfig, opts)
-    setTimeout(() => {
-      expect(output.testApi.connected).toBeFalse()
       expect(process.exit).not.toBeCalled()
       done()
     }, 500) // wait for setup to finish
