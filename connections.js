@@ -60,8 +60,8 @@ function connect(api, opts) {
     .getAsync(uri) // return the api paths for the api
     .then(data => {
       if (data.statusCode === 200) {
-        api.paths = data.body.api
-        api.connected = true
+        api.paths = data.body.api // eslint-disable-line no-param-reassign
+        api.connected = true // eslint-disable-line no-param-reassign
         opts.log.info(`${NAME} Connected to api: ${api.key}`)
         return api
       }
@@ -161,7 +161,8 @@ function configureApiCache(connectedApi, opts) {
   if (getRedisConfig(apiName, opts.cache)) {
     getRedisClient(apiName, opts)
       .then(getRedisClientFnc => {
-        connectedApi.client._hasRedis = true
+        connectedApi.client._hasRedis = true // eslint-disable-line no-param-reassign
+        // eslint-disable-next-line no-param-reassign
         connectedApi.client._redis = {
           prefix: apiName,
           client: getRedisClientFnc,
@@ -170,7 +171,7 @@ function configureApiCache(connectedApi, opts) {
       })
       .catch(err => {
         opts.log.error('Unable to create redisClient', { error: err })
-        connectedApi.client._hasRedis = false
+        connectedApi.client._hasRedis = false // eslint-disable-line no-param-reassign
       })
     opts.log.debug(`API configured to use redis cache: ${apiName}`)
   }
@@ -202,8 +203,8 @@ function setup(apisConfig, apisKeyConfig, opts) {
           if (myOpts.checkAPIs) {
             checkAPI(connApi, myOpts.log)
           }
-          configureApiCache(connApi, myOpts)
-          output[connApi.key] = connApi
+          const configuredApi = configureApiCache(connApi, myOpts)
+          output[connApi.key] = configuredApi
         }
       })
       myOpts.log.info(`${NAME} API setup done. ${JSON.stringify(connApis)}`)

@@ -66,24 +66,23 @@ function BasicAPI(options, base) {
     this._request = base._request.defaults(myOptions)
     this._redis = base._redis
     this._hasRedis = base._hasRedis
-    return
-  }
+  } else {
+    const opts = {
+      baseUrl: _toBaseUrl(myOptions),
+      headers: myOptions.headers,
+      json: myOptions.json,
+      pool: { maxSockets: Infinity },
+    }
 
-  const opts = {
-    baseUrl: _toBaseUrl(myOptions),
-    headers: myOptions.headers,
-    json: myOptions.json,
-    pool: { maxSockets: Infinity },
+    this._request = fetchWrappers(opts)
+    this._redis = myOptions.redis
+    this._hasRedis = !!(this._redis && this._redis.client)
+    this._basePath = myOptions.basePath || ''
+    this._defaultTimeout = myOptions.defaultTimeout || 2000
+    this._retryOnESOCKETTIMEDOUT = myOptions.retryOnESOCKETTIMEDOUT ? myOptions.retryOnESOCKETTIMEDOUT : undefined
+    this._maxNumberOfRetries = myOptions.maxNumberOfRetries ? myOptions.maxNumberOfRetries : 5
+    this._log = myOptions.log
   }
-
-  this._request = fetchWrappers(opts)
-  this._redis = myOptions.redis
-  this._hasRedis = !!(this._redis && this._redis.client)
-  this._basePath = myOptions.basePath || ''
-  this._defaultTimeout = myOptions.defaultTimeout || 2000
-  this._retryOnESOCKETTIMEDOUT = myOptions.retryOnESOCKETTIMEDOUT ? myOptions.retryOnESOCKETTIMEDOUT : undefined
-  this._maxNumberOfRetries = myOptions.maxNumberOfRetries ? myOptions.maxNumberOfRetries : 5
-  this._log = myOptions.log
 }
 
 /**
@@ -177,12 +176,10 @@ function _wrapCallback(api, options, method, callback) {
 
       Promise.resolve(redisMaybeFnc)
         .then(client => {
-          client.set(key, value, (err, res) => {
-            if (err) {
-              callback(err)
-            }
+          client.set(key, value, err => {
+            if (err) callback(err)
           })
-          client.expire(key, api._redis.expire || 300, (err, res) => {
+          client.expire(key, api._redis.expire || 300, err => {
             if (err) callback(err)
           })
         })
@@ -208,7 +205,7 @@ function _makeRequest(api, options, method, callback) {
     opts = { headers: {}, requestGuid: uuidv4(), ...options }
   }
   opts.headers[REQUEST_GUID] = opts.requestGuid
-  api.lastRequestGuid = opts.requestGuid
+  api.lastRequestGuid = opts.requestGuid // eslint-disable-line no-param-reassign
   const cb = _wrapCallback(api, opts, method, callback)
   return api._request[method]({ ...opts, uri: fullUriPath }, cb)
 }
