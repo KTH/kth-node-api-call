@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
-
 const BasicAPI = require('./basic')
+
+// Test api server
 require('./test/mock-api/server')
 
 const logConsole = false
@@ -10,6 +11,17 @@ const mockLogger = {
   warn: logConsole ? console.log : () => {},
   info: logConsole ? console.log : () => {},
 }
+
+// Mock for redis, to test caching
+const redisGet = jest.fn().mockImplementation((key, callback) => {
+  if (key === 'mocktest:get:/api/test/cached') {
+    return callback(undefined, '{ "body": "from cache", "statusCode": 200 }')
+  }
+  return callback(undefined, undefined)
+})
+const redisSet = jest.fn().mockImplementation((key, value, callback) => {
+  callback(undefined, 'OK')
+})
 
 const opts = {
   hostname: '127.0.0.1',
@@ -22,11 +34,25 @@ const opts = {
   maxNumberOfRetries: 2,
   basePath: '/api/test',
   log: mockLogger,
+  redis: {
+    prefix: 'mocktest',
+    client() {
+      return Promise.resolve({
+        set: redisSet,
+        get: redisGet,
+        expire: (key, limit, callback) => {
+          callback(undefined, 'OK')
+        },
+      })
+    },
+    expire: undefined,
+  },
 }
 
 const api = BasicAPI(opts)
 
 describe('basic calls works as expected', () => {
+  // Test callback based functions
   it('performs a successful get request when calling get', done => {
     api.get('/method', (error, response, body) => {
       expect(body.method).toBe('get')
@@ -34,6 +60,7 @@ describe('basic calls works as expected', () => {
       done()
     })
   })
+
   it('performs a successful post request when calling post', done => {
     api.post({ uri: '/method', body: { test: true } }, (error, response, body) => {
       expect(body).toStrictEqual({ postdata: { test: true }, method: 'post' })
@@ -57,6 +84,7 @@ describe('basic calls works as expected', () => {
       done()
     })
   })
+
   it('performs a successful delete request when calling del', done => {
     api.del('/method', (error, response, body) => {
       expect(body.method).toBe('del')
@@ -64,6 +92,7 @@ describe('basic calls works as expected', () => {
       done()
     })
   })
+
   it('performs a successful patch request when calling patch', done => {
     api.patch('/method', (error, response, body) => {
       expect(body.method).toBe('patch')
@@ -71,6 +100,7 @@ describe('basic calls works as expected', () => {
       done()
     })
   })
+
   it('performs a successful head request when calling head', done => {
     api.head('/method', (error, response, body) => {
       expect(body).toBeUndefined()
@@ -79,6 +109,7 @@ describe('basic calls works as expected', () => {
     })
   })
 
+  // Test promise based functions
   it('performs a successful get request when calling getAsync', async () => {
     const result = await api.getAsync('/method')
     expect(result.body.method).toBe('get')
@@ -114,6 +145,8 @@ describe('basic calls works as expected', () => {
     expect(result.body).toBeUndefined()
     expect(result.statusCode).toBe(200)
   })
+
+  // Test retries on timeout
   it('should retry on timeout', async () => {
     api._request.post = jest.fn().mockImplementation(async (options, callback) => {
       callback(new Error('ESOCKETTIMEDOUT'))
@@ -125,6 +158,27 @@ describe('basic calls works as expected', () => {
     })
   })
 
+  // Test Redis caching
+  it('should pick value from cache if enabled and key exists when calling getAsync', async () => {
+    const result = await api.getAsync({ uri: '/cached', useCache: true })
+    expect(result.body).toBe('from cache')
+    expect(result.statusCode).toBe(200)
+    expect(redisGet).toBeCalledWith('mocktest:get:/api/test/cached', expect.anything())
+  })
+
+  it('should cache value if cache is enabled when calling getAsync', async () => {
+    const result = await api.getAsync({ uri: '/method', useCache: true })
+    expect(result.body.method).toBe('get')
+    expect(result.statusCode).toBe(200)
+    expect(redisGet).toBeCalledWith('mocktest:get:/api/test/method', expect.anything())
+    expect(redisSet).toBeCalledWith(
+      'mocktest:get:/api/test/method',
+      '{"size":0,"timeout":50,"statusCode":200,"body":{"method":"get","query":{}}}',
+      expect.anything()
+    )
+  })
+
+  // Shut down test api server
   afterAll(done => {
     api.getAsync('/goodbye')
     setTimeout(done, 500)
