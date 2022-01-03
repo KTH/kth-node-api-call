@@ -173,7 +173,7 @@ module.exports = (function () {
    *
    */
   function defaultOptions(requestOptions) {
-    const options = requestOptions || {}
+    const options = { ...requestOptions } || {}
     // default options
     options.port = requestOptions.port
     options.method = requestOptions.method || 'GET'
