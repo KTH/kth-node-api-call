@@ -25,8 +25,7 @@ const redisSet = jest.fn().mockImplementation((key, value, callback) => {
 
 const opts = {
   hostname: '127.0.0.1',
-  host: 'localhost',
-  port: '3210',
+  host: 'localhost:3210',
   https: false,
   json: true,
   defaultTimeout: 50,
@@ -50,6 +49,10 @@ const opts = {
 }
 
 const api = BasicAPI(opts)
+opts.retryOnESOCKETTIMEDOUT = false
+opts.host = 'localhost'
+opts.port = '666'
+const noRetryApi = BasicAPI(opts)
 
 describe('basic calls works as expected', () => {
   // Test callback based functions
@@ -146,18 +149,6 @@ describe('basic calls works as expected', () => {
     expect(result.statusCode).toBe(200)
   })
 
-  // Test retries on timeout
-  it('should retry on timeout', async () => {
-    api._request.post = jest.fn().mockImplementation(async (options, callback) => {
-      callback(new Error('ESOCKETTIMEDOUT'))
-    })
-
-    await api.postAsync('/timeout').catch(e => {
-      expect(e.message).toContain('timed out after 2 retries. The connection to the API seems to be overloaded.')
-      expect(api._request.post).toBeCalledTimes(3)
-    })
-  })
-
   // Test Redis caching
   it('should pick value from cache if enabled and key exists when calling getAsync', async () => {
     const result = await api.getAsync({ uri: '/cached', useCache: true })
@@ -176,6 +167,28 @@ describe('basic calls works as expected', () => {
       '{"size":0,"timeout":50,"statusCode":200,"body":{"method":"get","query":{}}}',
       expect.anything()
     )
+  })
+
+  // Test retries on timeout
+  it('should retry on timeout', async () => {
+    api._request.post = jest.fn().mockImplementation(async (options, callback) => {
+      callback(new Error('ESOCKETTIMEDOUT'))
+    })
+
+    await api.postAsync('/timeout').catch(e => {
+      expect(e.message).toContain('timed out after 2 retries. The connection to the API seems to be overloaded.')
+      expect(api._request.post).toBeCalledTimes(3)
+    })
+  })
+  it('should not retry on timeout', async () => {
+    noRetryApi._request.post = jest.fn().mockImplementation(async (options, callback) => {
+      callback(new Error('ESOCKETTIMEDOUT'))
+    })
+
+    await noRetryApi.postAsync('/timeout').catch(e => {
+      expect(e.message).toContain('ESOCKETTIMEDOUT')
+      expect(noRetryApi._request.post).toBeCalledTimes(1)
+    })
   })
 
   // Shut down test api server
