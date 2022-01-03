@@ -420,7 +420,7 @@ BasicAPI.prototype.defaults = function (options) {
 BasicAPI.prototype.resolve = function (uri, params) {
   let myUri = uri
   for (const key in params) {
-    if (params.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(params, key)) {
       const value = params[key]
       myUri = uri.replace(new RegExp(':' + key, 'gi'), encodeURIComponent(value))
     }

@@ -207,7 +207,7 @@ module.exports = (function () {
       } else {
         // if status code is bad, return an error
         if (response.statusCode >= 400) {
-          return errFunc({
+          errFunc({
             statusCode: response.statusCode,
             body: response.body,
           })
@@ -245,7 +245,7 @@ module.exports = (function () {
 
     const normalizedHeaders = {}
     for (const name in headers) {
-      if (headers.hasOwnProperty(name)) {
+      if (Object.prototype.hasOwnProperty.call(headers, name)) {
         normalizedHeaders[name.toLowerCase()] = headers[name]
       }
     }

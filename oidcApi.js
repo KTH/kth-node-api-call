@@ -177,7 +177,7 @@ module.exports = (function () {
         originalResponse.redirect('/redirected/to/login/from/apicall?originalUrl=' + originalRequest.url)
         break
 
-      case 412:
+      case 412: {
         // Precondition failed - token was missing but should exist for resource
         console.log('Precondition failed')
         const TokenCall = tokenCall({
@@ -189,7 +189,7 @@ module.exports = (function () {
         TokenCall.getClientToken(
           token => {
             console.log('Got client token')
-            self.headers.Authentication = 'Bearer ' + token
+            self.headers.Authentication = 'Bearer ' + token // eslint-disable-line no-param-reassign
             self.request(onSuccess, onError)
           },
           err => {
@@ -199,7 +199,7 @@ module.exports = (function () {
           }
         )
         break
-
+      }
       case 200:
         // Everything went fine
         console.log('200 OK')
