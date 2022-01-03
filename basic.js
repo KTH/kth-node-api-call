@@ -196,21 +196,21 @@ function _wrapCallback(api, options, method, callback) {
 }
 
 function _makeRequest(api, options, method, callback) {
-  const uri = _getURI(api, options)
+  const fullUriPath = _getURI(api, options)
   let opts
   if (typeof options === 'string') {
     opts = {
-      uri,
+      uri: options,
       requestGuid: uuidv4(),
       headers: {},
     }
   } else {
-    opts = { headers: {}, requestGuid: uuidv4(), ...options, uri }
+    opts = { headers: {}, requestGuid: uuidv4(), ...options }
   }
   opts.headers[REQUEST_GUID] = opts.requestGuid
   api.lastRequestGuid = opts.requestGuid
   const cb = _wrapCallback(api, opts, method, callback)
-  return api._request[method](opts, cb)
+  return api._request[method]({ ...opts, uri: fullUriPath }, cb)
 }
 
 function _exec(api, options, method, callback) {
