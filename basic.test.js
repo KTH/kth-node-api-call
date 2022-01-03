@@ -191,6 +191,10 @@ describe('basic calls works as expected', () => {
     })
   })
 
+  it('should return a resolved path then calling resolve', () => {
+    const result = api.resolve('/api/test/:name/:task/', { name: 'Ingemar Andersson', task: 'pruttrace' })
+    expect(result).toBe('/api/test/Ingemar%20Andersson/pruttrace/')
+  })
   // Shut down test api server
   afterAll(done => {
     api.getAsync('/goodbye')
