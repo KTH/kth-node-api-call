@@ -8,31 +8,33 @@ const bodyParser = require('body-parser')
 const { GracefulShutdownManager } = require('@moebius/http-graceful-shutdown')
 const config = require('./config')
 
-const app = express()
+module.exports = async () => {
+  const app = express()
 
-app.use(formData.parse())
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(bodyParser.json())
+  app.use(formData.parse())
+  app.use(bodyParser.urlencoded({ extended: true }))
+  app.use(bodyParser.json())
 
-config.paths.forEach(path => {
-  // console.log('Added path', path.url)
-  app[path.method](path.url, (req, res) => {
-    // console.log('Responded on path', path.url)
-    const { statusCode, body } = path.response(req, res)
-    res.status(statusCode).send(body)
+  config.paths.forEach(path => {
+    // console.log('Added path', path.url)
+    app[path.method](path.url, (req, res) => {
+      // console.log('Responded on path', path.url)
+      const { statusCode, body } = path.response(req, res)
+      res.status(statusCode).send(body)
+    })
   })
-})
 
-const server = app.listen(config.host.port, config.host.address)
-const shutdownManager = new GracefulShutdownManager(server)
+  const server = app.listen(config.host.port, config.host.address)
+  const shutdownManager = new GracefulShutdownManager(server)
 
-app.get('/api/test/goodbye', (req, res) => {
-  setTimeout(() => {
-    shutdownManager.terminate(() => {})
-  }, 500)
-  res.status(200).send({ status: 'Shutdown' })
-})
-app.use((req, res) => {
-  // console.log('Caught request on path', req.url)
-  res.status(404).send('')
-})
+  app.get('/api/test/goodbye', (req, res) => {
+    setTimeout(() => {
+      shutdownManager.terminate(() => {})
+    }, 500)
+    res.status(200).send({ status: 'Shutdown' })
+  })
+  app.use((req, res) => {
+    // console.log('Caught request on path', req.url)
+    res.status(404).send('')
+  })
+}

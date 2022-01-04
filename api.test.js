@@ -1,11 +1,7 @@
 /* eslint-disable no-console */
 const api = require('./api')
 
-// Test api server
-require('./test/mock-api/server')
-
 const testApi = api({ https: false, host: 'localhost', port: '3210', path: '/api/test/apitest' })
-const apiShutdown = api({ https: false, host: 'localhost', port: '3210', path: '/api/test/goodbye' })
 
 describe('api calls works as expected', () => {
   it('performs a successful get request when calling getText', done => {
@@ -35,10 +31,5 @@ describe('api calls works as expected', () => {
   it('performs a successful get request when calling promisedApiCall', async () => {
     const data = await testApi.promisedApiCall()
     expect(data).toBe('text/plain')
-  })
-
-  // Shut down test api server
-  afterAll(done => {
-    apiShutdown.request(() => setTimeout(done, 500))
   })
 })

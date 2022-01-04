@@ -60,6 +60,8 @@
   "// (jest)": "configuration version 2020-06-15 (API+NPM) - might also reside as module.exports in jest.config.js",
   "jest": {
     "clearMocks": true,
+    "globalSetup": "./test/mock-api/server.js",
+    "globalTeardown": "./test/mock-api/teardown.js",
     "notifyMode": "failure-change",
     "setupFilesAfterEnv": [
       "jest-extended/all"
