@@ -64,5 +64,21 @@ module.exports = {
       url: '/api/test/method',
       response: () => ({ statusCode: 200, body: { method: 'patch' } }),
     },
+    {
+      method: 'get',
+      url: '/api/test/apitest',
+      response: req => ({
+        statusCode: 200,
+        body: req.headers.accept === 'application/json' ? { type: req.headers.accept } : req.headers.accept,
+      }),
+    },
+    {
+      method: 'post',
+      url: '/api/test/apitest',
+      response: req => ({
+        statusCode: 200,
+        body: req.body,
+      }),
+    },
   ],
 }
