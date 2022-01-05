@@ -2,10 +2,10 @@
 
 'use strict'
 
-const querystring = require('querystring')
 const url = require('url')
 const { v4: uuidv4 } = require('uuid')
 const { fetchWrappers } = require('./fetchUtils')
+const urlJoin = require('url-join')
 
 const REQUEST_GUID = 'request-guid'
 /**
@@ -128,20 +128,10 @@ const retryWrapper = (_this, cb, args) => {
 }
 
 function _getURI(api, options) {
-  let uri = api._basePath
-
-  if (typeof options === 'string') {
-    uri += options
-  } else {
-    uri += options.uri
-  }
-
-  if (options.qs && Object.keys(options.qs).length) {
-    const separator = uri.includes('?') ? '&' : '?'
-    uri += separator + new URLSearchParams(options.qs).toString()
-  }
-
-  return uri
+  const relpath = typeof options === 'string' ? options : options.uri || ''
+  const qs = new URLSearchParams(options.qs).toString()
+  if (qs) return urlJoin(api._basePath, relpath, '?' + qs)
+  return urlJoin(api._basePath, relpath)
 }
 
 function _getKey(api, options, method) {

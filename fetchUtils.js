@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 const fetch = require('node-fetch')
-
+const urlJoin = require('url-join')
 const FormData = require('form-data')
 
 const MIME_JSON = 'application/json'
@@ -33,7 +33,7 @@ function _createFetchWrapper(wrapperOptions, method) {
   return async (options, callback) => {
     const { uri } = options
 
-    const target = `${baseUrl}${uri}`
+    const target = urlJoin(baseUrl, uri)
     let opts
     if (options.formData) {
       opts = {}
@@ -79,7 +79,7 @@ function _createFetchWrapper(wrapperOptions, method) {
  *   qsStringifyOptions:
  *     (Description in request)
  *     Object containing options to pass to the qs.stringify method.
- *     Alternatively pass options to Pthe querystring.stringify method using this format {sep:';', eq:':', options:{}}.
+ *     Alternatively pass options to the querystring.stringify method using this format {sep:';', eq:':', options:{}}.
  *     For example, to change the way arrays are converted to query strings using the qs module
  *     pass the arrayFormat option with one of indices|brackets|repeat
  *
@@ -129,7 +129,8 @@ async function fetchWrapper(options, callback) {
     headers[HEADER_CONTENT_TYPE] = MIME_JSON
   }
 
-  const fetchUrl = Object.keys(qs).length === 0 ? url : `${url}?${new URLSearchParams(qs).toString()}`
+  const qsStr = new URLSearchParams(qs).toString()
+  const fetchUrl = qsStr ? urlJoin(url, '?' + qsStr) : url
 
   const fetchOptions = {
     method,
