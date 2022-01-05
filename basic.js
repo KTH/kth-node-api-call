@@ -136,20 +136,17 @@ function _getURI(api, options) {
     uri += options.uri
   }
 
+  if (options.qs && Object.keys(options.qs).length) {
+    const separator = uri.includes('?') ? '&' : '?'
+    uri += separator + new URLSearchParams(options.qs).toString()
+  }
+
   return uri
 }
 
 function _getKey(api, options, method) {
   const prefix = api._redis.prefix ? api._redis.prefix + ':' : ''
-  let query = ''
-  if (options.qs) {
-    if (typeof options.qs === 'string') {
-      query += '?' + options.qs
-    } else {
-      query += '?' + querystring.stringify(options.qs)
-    }
-  }
-  return prefix + method + ':' + _getURI(api, options) + query
+  return prefix + method + ':' + _getURI(api, options)
 }
 
 function _wrapCallback(api, options, method, callback) {
