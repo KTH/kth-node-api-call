@@ -1,5 +1,4 @@
 /* eslint-disable func-names */
-const url = require('url')
 const api = require('./api')
 
 module.exports = (function () {
@@ -14,11 +13,11 @@ module.exports = (function () {
     return new TokenCall(options)
   }
   TokenCall.prototype.getClientToken = function (onSuccess, onError) {
-    const parsedTokenUrl = url.parse(this.options.tokenEndpoint)
+    const parsedTokenUrl = new URL(this.options.tokenEndpoint)
     const TokenApi = api({
       host: parsedTokenUrl.host,
       port: parsedTokenUrl.port,
-      path: parsedTokenUrl.path,
+      path: parsedTokenUrl.pathname,
       query: {
         grant_type: 'client_credential',
         client_id: this.options.clientKey,

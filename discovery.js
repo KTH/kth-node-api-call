@@ -3,7 +3,6 @@
 /**
  * Class to handle OpenIDConnect discovery through .well-known
  */
-const url = require('url')
 const api = require('./api')
 
 module.exports = (function () {
@@ -81,7 +80,7 @@ module.exports = (function () {
    * @param onError callback for when an error occurs during jwk endpoint fetching
    */
   function getJwkData(jwksUri, onSuccess, onError) {
-    const parsedJwkEndpoint = url.parse(jwksUri)
+    const parsedJwkEndpoint = new URL(jwksUri)
     const jwkDiscovery = api({
       host: parsedJwkEndpoint.host,
       path: parsedJwkEndpoint.pathname,
