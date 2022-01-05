@@ -234,12 +234,17 @@ module.exports = (function () {
    * @return promise for the api call
    */
   Api.prototype.promisedApiCall = function () {
-    return new Promise((resolve, reject) =>
-      this.request(
+    return new Promise((resolve, reject) => {
+      this.httpRequestSettings.headers[HEADER_ACCEPT] = '*/*'
+      this.httpRequestSettings.headers[REQUEST_GUID] = uuidv4()
+      this.httpRequestSettings.method = 'GET'
+      delete this.httpRequestSettings.body
+
+      return this.request(
         data => resolve(data),
         err => reject(err)
       )
-    )
+    })
   }
 
   return factory

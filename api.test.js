@@ -30,6 +30,6 @@ describe('api calls works as expected', () => {
   })
   it('performs a successful get request when calling promisedApiCall', async () => {
     const data = await testApi.promisedApiCall()
-    expect(data).toBe('text/plain')
+    expect(data).toBe('*/*')
   })
 })
