@@ -111,8 +111,8 @@ describe('basic calls works as expected', () => {
 
   // Test promise based functions
   it('performs a successful get request when calling getAsync', async () => {
-    const result = await api.getAsync('/method')
-    expect(result.body.method).toBe('get')
+    const result = await api.getAsync({ uri: '/method', qs: { param: 'query string' } })
+    expect(result.body).toMatchObject({ method: 'get', query: { param: 'query string' } })
     expect(result.statusCode).toBe(200)
   })
   it('performs a successful post request when calling postAsync', async () => {
@@ -155,13 +155,13 @@ describe('basic calls works as expected', () => {
   })
 
   it('should cache value if cache is enabled when calling getAsync', async () => {
-    const result = await api.getAsync({ uri: '/method', useCache: true })
+    const result = await api.getAsync({ uri: '/method', useCache: true, qs: { param: 'test' } })
     expect(result.body.method).toBe('get')
     expect(result.statusCode).toBe(200)
-    expect(redisGet).toBeCalledWith('mocktest:get:/api/test/method', expect.anything())
+    expect(redisGet).toBeCalledWith('mocktest:get:/api/test/method?param=test', expect.anything())
     expect(redisSet).toBeCalledWith(
-      'mocktest:get:/api/test/method',
-      '{"size":0,"timeout":50,"statusCode":200,"body":{"method":"get","query":{}}}',
+      'mocktest:get:/api/test/method?param=test',
+      '{"size":0,"timeout":50,"statusCode":200,"body":{"method":"get","query":{"param":"test"}}}',
       expect.anything()
     )
   })
