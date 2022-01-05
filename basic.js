@@ -2,12 +2,22 @@
 
 'use strict'
 
-const url = require('url')
+const urlJoin = require('url-join')
 const { v4: uuidv4 } = require('uuid')
 const { fetchWrappers } = require('./fetchUtils')
-const urlJoin = require('url-join')
 
 const REQUEST_GUID = 'request-guid'
+
+function _toBaseUrl({ protocol, https, host, hostname, port }) {
+  const myUrl = new URL('http://localhost')
+  myUrl.protocol = protocol || (https ? 'https:' : 'http:')
+  if (hostname) myUrl.hostname = hostname
+  if (host) myUrl.host = host
+  if (protocol) myUrl.protocol = protocol
+  if (port) myUrl.port = port
+  return myUrl.toString()
+}
+
 /**
  * Creates a wrapper around request with useful defaults.
  * @param {object} [options] - plain js object with options
@@ -26,35 +36,6 @@ const REQUEST_GUID = 'request-guid'
  * @param {BasicAPI} [base] - used internally when calling defaults
  * @constructor
  */
-
-function _toBaseUrl(parts) {
-  const protocol = parts.protocol || (parts.https ? 'https:' : 'http:')
-  let host = parts.host || parts.hostname || 'localhost'
-  let { port } = parts
-
-  if (!port) {
-    const portIndex = host.lastIndexOf(':')
-
-    if (portIndex >= 0) {
-      port = host.substr(portIndex + 1)
-      host = host.substring(0, portIndex)
-    }
-  }
-
-  if (!port) {
-    return url.format({
-      protocol,
-      host,
-    })
-  }
-
-  return url.format({
-    protocol,
-    hostname: host,
-    port,
-  })
-}
-
 function BasicAPI(options, base) {
   if (!(this instanceof BasicAPI)) {
     return new BasicAPI(options, base)
