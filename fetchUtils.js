@@ -10,8 +10,8 @@ const HEADER_CONTENT_TYPE = 'content-type'
 async function _parseResponseBody(response, json) {
   const contentLength = response.headers.get(HEADER_CONTENT_LENGTH)
   const contentType = response.headers.get(HEADER_CONTENT_TYPE)
-  if (contentLength === '0' || !contentType.includes(MIME_JSON)) {
-    return response.text()
+  if (contentLength === '0' || !contentType) {
+    return response.arrayBuffer()
   }
   return json ? response.json() : response.text()
 }
