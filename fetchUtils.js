@@ -20,7 +20,7 @@ async function _parseResponseBody(response, json) {
   if (contentType?.includes(MIME_TEXT)) {
     return response.text()
   }
-  return json ? response.json() : response.buffer()
+  return response.buffer()
 }
 function buildFormData(data) {
   const form = new FormData()
