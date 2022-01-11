@@ -4,16 +4,23 @@ const urlJoin = require('url-join')
 const FormData = require('form-data')
 
 const MIME_JSON = 'application/json'
+const MIME_TEXT = 'text/'
 const HEADER_CONTENT_LENGTH = 'content-length'
 const HEADER_CONTENT_TYPE = 'content-type'
 
 async function _parseResponseBody(response, json) {
   const contentLength = response.headers.get(HEADER_CONTENT_LENGTH)
   const contentType = response.headers.get(HEADER_CONTENT_TYPE)
-  if (contentLength === '0' || !contentType) {
-    return response.arrayBuffer()
+  if (contentLength === '0') {
+    return response.text()
   }
-  return json ? response.json() : response.text()
+  if (contentType?.includes(MIME_JSON)) {
+    return response.json()
+  }
+  if (contentType?.includes(MIME_TEXT)) {
+    return response.text()
+  }
+  return json ? response.json() : response.buffer()
 }
 function buildFormData(data) {
   const form = new FormData()
