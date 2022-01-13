@@ -5,6 +5,7 @@ const FormData = require('form-data')
 
 const MIME_JSON = 'application/json'
 const MIME_TEXT = 'text/'
+const MIME_SVG = 'image/svg+xml'
 const HEADER_CONTENT_LENGTH = 'content-length'
 const HEADER_CONTENT_TYPE = 'content-type'
 
@@ -27,6 +28,9 @@ async function _parseResponseBody(response, json) {
   }
   if (contentType?.includes(MIME_JSON)) {
     return response.json()
+  }
+  if (contentType?.includes(MIME_SVG)) {
+    return response.text()
   }
   if (contentType?.includes(MIME_TEXT)) {
     return response.text()
