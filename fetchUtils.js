@@ -8,6 +8,17 @@ const MIME_TEXT = 'text/'
 const HEADER_CONTENT_LENGTH = 'content-length'
 const HEADER_CONTENT_TYPE = 'content-type'
 
+function removeUndefined(obj) {
+  const returnObj = Object.keys(obj).reduce((acc, key) => {
+    if (obj[key] === undefined) {
+      return acc
+    }
+    acc[key] = obj[key]
+    return acc
+  }, {})
+  return returnObj
+}
+
 async function _parseResponseBody(response, json) {
   const contentLength = response.headers.get(HEADER_CONTENT_LENGTH)
   const contentType = response.headers.get(HEADER_CONTENT_TYPE)
@@ -130,14 +141,16 @@ function _createFetchWrapper(wrapperOptions, method) {
  * @param {function} callback  Callback formerly passed to request
  */
 async function fetchWrapper(options, callback) {
-  const { url, qs, method, json, body, headers } = options
+  const { url, qs = {}, method, json, body, headers } = options
+
+  const queryObj = removeUndefined(qs)
 
   if (json) {
     headers[HEADER_CONTENT_TYPE] = MIME_JSON
   }
 
-  const qsStr = new URLSearchParams(qs).toString()
-  const fetchUrl = qsStr ? urlJoin(url, '?' + qsStr) : url
+  const queryStr = new URLSearchParams(queryObj).toString()
+  const fetchUrl = queryStr ? urlJoin(url, '?' + queryStr) : url
 
   const fetchOptions = {
     method,
@@ -181,4 +194,5 @@ function fetchWrappers(wrapperOptions = {}) {
 module.exports = {
   fetchWrapper,
   fetchWrappers,
+  removeUndefined,
 }

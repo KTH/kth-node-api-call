@@ -4,7 +4,7 @@
 
 const urlJoin = require('url-join')
 const { v4: uuidv4 } = require('uuid')
-const { fetchWrappers } = require('./fetchUtils')
+const { fetchWrappers, removeUndefined } = require('./fetchUtils')
 
 const REQUEST_GUID = 'request-guid'
 
@@ -110,8 +110,9 @@ const retryWrapper = (_this, cb, args) => {
 
 function _getURI(api, options) {
   const relpath = typeof options === 'string' ? options : options.uri || ''
-  const qs = new URLSearchParams(options.qs).toString()
-  if (qs) return urlJoin(api._basePath, relpath, '?' + qs)
+  const queryObj = removeUndefined(options.qs || {})
+  const queryString = new URLSearchParams(queryObj).toString()
+  if (queryString) return urlJoin(api._basePath, relpath, '?' + queryString)
   return urlJoin(api._basePath, relpath)
 }
 
