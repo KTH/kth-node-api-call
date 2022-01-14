@@ -71,14 +71,14 @@ function BasicAPI(options, base) {
  * @param {*} e
  */
 const isTimeoutError = e => {
-  if (e.name === 'Error') {
-    return e.toString().includes('TIMEDOUT')
+  if (e.name.includes('Error')) {
+    return e.toString().toLowerCase().includes('timedout')
   }
   if (typeof e === 'object') {
-    return JSON.stringify(e).includes('TIMEDOUT')
+    return JSON.stringify(e).toLowerCase().includes('timedout')
   }
 
-  return e.toString().includes('TIMEDOUT')
+  return e.toString().toLowerCase().includes('timedout')
 }
 
 const retryWrapper = (_this, cb, args) => {
