@@ -27,20 +27,20 @@ const nodeApi = {
     proxyBasePath: '/api/applicationName', // api base path
     required: true, // is the api required? Optional, defaults to false
     defaultTimeout: 2000, // milliseconds. Optional, defaults to 2000
-    }
+  },
 }
 
 const cacheConfig = {
   namedApi: {
     redis: {
       host: 'localhost',
-      port: 6379
-    }
-  }
+      port: 6379,
+    },
+  },
 }
 
 const apiKey = {
-  namedApi: '1234'
+  namedApi: '1234',
 }
 
 const options = {
@@ -48,7 +48,7 @@ const options = {
   log: myLogger, // your logger instance
   redis: myRedis, // your redis instance
   cache: cacheConfig, // your api cache options
-  checkAPIs: true
+  checkAPIs: true,
 }
 // either
 module.exports = connections.setup(nodeApi, apiKey, options)
@@ -166,7 +166,7 @@ Note that if you use Redis and/or the async methods you might lose some function
 
 ### Migration from version 3 to 4
 
-- `jar` and `cookie` where basic wrappers to the corresponding [request][request] methods. They were removed in version 4.
+- `jar` and `cookie` were basic wrappers to the corresponding [request][request] methods. They were removed in version 4.
 - `defaults` was deprecated in version 4. Use `new BasicAPI(options)` instead.
 
 [request]: https://github.com/request/request
