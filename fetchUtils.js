@@ -3,6 +3,8 @@ const fetch = require('node-fetch')
 const urlJoin = require('url-join')
 const FormData = require('form-data')
 
+const HEADER_USER_AGENT = 'User-Agent'
+const USER_AGENT = 'KTH api-call/4.*'
 const MIME_JSON = 'application/json'
 const MIME_TEXT = 'text/'
 const MIME_SVG = 'image/svg+xml'
@@ -53,6 +55,7 @@ function buildFormData(data) {
 function _createFetchWrapper(wrapperOptions, method) {
   const { baseUrl = '', headers = {}, json = true } = wrapperOptions
   return async (options, callback) => {
+    headers[HEADER_USER_AGENT] = USER_AGENT
     const { uri } = options
 
     const target = urlJoin(baseUrl, uri)
@@ -146,6 +149,7 @@ function _createFetchWrapper(wrapperOptions, method) {
  */
 async function fetchWrapper(options, callback) {
   const { url, qs = {}, method, json, body, headers } = options
+  headers[HEADER_USER_AGENT] = USER_AGENT
 
   const queryObj = removeUndefined(qs)
 
