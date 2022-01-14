@@ -67,18 +67,21 @@ function BasicAPI(options, base) {
 }
 
 /**
- * ESOCKETTIMEDOUT or ETIMEDOUT errors return true.
+ * ESOCKETTIMEDOUT, ETIMEDOUT, and node-fetch timeout errors return true.
  * @param {*} e
  */
 const isTimeoutError = e => {
+  let errorStr
   if (e.name.includes('Error')) {
-    return e.toString().toLowerCase().includes('timedout')
+    errorStr = e.toString().toLowerCase()
+    return errorStr.includes('timedout') || errorStr.includes('timeout')
   }
   if (typeof e === 'object') {
-    return JSON.stringify(e).toLowerCase().includes('timedout')
+    errorStr = JSON.stringify(e).toLowerCase()
+    return errorStr.includes('timedout') || errorStr.includes('timeout')
   }
-
-  return e.toString().toLowerCase().includes('timedout')
+  errorStr = e.toString().toLowerCase()
+  return errorStr.includes('timedout') || errorStr.includes('timeout')
 }
 
 const retryWrapper = (_this, cb, args) => {
