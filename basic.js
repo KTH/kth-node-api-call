@@ -9,10 +9,10 @@ const { fetchWrappers, removeUndefined } = require('./fetchUtils')
 const REQUEST_GUID = 'request-guid'
 
 function _toBaseUrl({ protocol, https, host, hostname, port }) {
-  const myUrl = new URL('http://localhost')
+  let baseurl = host || hostname || 'http://localhost'
+  if (!baseurl.includes('://')) baseurl = `http://${baseurl}`
+  const myUrl = new URL(baseurl)
   myUrl.protocol = protocol || (https ? 'https:' : 'http:')
-  if (hostname) myUrl.hostname = hostname
-  if (host) myUrl.host = host
   if (protocol) myUrl.protocol = protocol
   if (port) myUrl.port = port
   return myUrl.toString()
