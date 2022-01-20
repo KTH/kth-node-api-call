@@ -29,7 +29,12 @@ async function _parseResponseBody(response, json) {
     return response.text()
   }
   if (contentType?.includes(MIME_JSON)) {
-    return response.json()
+    const buffer = await response.buffer()
+    try {
+      return JSON.parse(buffer.toString())
+    } catch (error) {
+      return buffer.toString()
+    }
   }
   if (contentType?.includes(MIME_SVG)) {
     return response.text()
