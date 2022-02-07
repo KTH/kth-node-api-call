@@ -22,7 +22,7 @@ function removeUndefined(obj) {
   return returnObj
 }
 
-async function _parseResponseBody(response, json) {
+async function _parseResponseBody(response) {
   const contentLength = response.headers.get(HEADER_CONTENT_LENGTH)
   const contentType = response.headers.get(HEADER_CONTENT_TYPE)
   if (contentLength === '0') {
@@ -81,7 +81,7 @@ function _createFetchWrapper(wrapperOptions, method) {
 
     try {
       const response = await fetch(target, opts)
-      const responseBody = method === 'HEAD' ? undefined : await _parseResponseBody(response, json)
+      const responseBody = method === 'HEAD' ? undefined : await _parseResponseBody(response)
       response.statusCode = response.status
       callback(null, response, responseBody)
     } catch (error) {
@@ -173,7 +173,7 @@ async function fetchWrapper(options, callback) {
 
   try {
     const response = await fetch(fetchUrl, fetchOptions)
-    const responseBody = await _parseResponseBody(response, json)
+    const responseBody = await _parseResponseBody(response)
     response.statusCode = response.status
     callback(null, response, responseBody)
   } catch (error) {
