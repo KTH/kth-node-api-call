@@ -108,6 +108,20 @@ describe('basic calls works as expected', () => {
       done()
     })
   })
+  it('performs a successful get request when calling get with option encoding utf8', done => {
+    api.get({ uri: '/options', encoding: 'utf8' }, (error, response, body) => {
+      expect(body).toBeInstanceOf(Object)
+      expect(response.statusCode).toBe(200)
+      done()
+    })
+  })
+  it('performs a successful get request when calling get with option encoding null', done => {
+    api.get({ uri: '/options', encoding: null }, (error, response, body) => {
+      expect(body).toBeInstanceOf(Buffer)
+      expect(response.statusCode).toBe(200)
+      done()
+    })
+  })
 
   // Test promise based functions
   it('performs a successful get request when calling getAsync', async () => {
@@ -143,6 +157,19 @@ describe('basic calls works as expected', () => {
   it('performs a successful head request when calling headAsync', async () => {
     const result = await api.headAsync('/method')
     expect(result.body).toBeUndefined()
+    expect(result.statusCode).toBe(200)
+  })
+
+  // Test promise based functions with options
+  it('performs a successful get request when calling getAsync with option encoding utf8', async () => {
+    const result = await api.getAsync({ uri: '/options', encoding: 'utf8' })
+    expect(result.body).toBeInstanceOf(Object)
+    expect(result.statusCode).toBe(200)
+  })
+  // Test promise based functions with options
+  it('performs a successful get request when calling getAsync with option encoding null', async () => {
+    const result = await api.getAsync({ uri: '/options', encoding: null })
+    expect(result.body).toBeInstanceOf(Buffer)
     expect(result.statusCode).toBe(200)
   })
 

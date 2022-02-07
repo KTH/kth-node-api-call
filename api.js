@@ -42,7 +42,11 @@ module.exports = (function () {
     options.headers = requestOptions.headers || {}
     options.json = requestOptions.json || true
     options.qsOptions = requestOptions.qsOptions || { arrayFormat: 'brackets' }
-    options.encoding = requestOptions.encoding || 'utf8'
+    if (requestOptions.encoding || requestOptions.encoding === null) {
+      options.encoding = requestOptions.encoding
+    } else {
+      options.encoding = 'utf8'
+    }
 
     if (typeof requestOptions.https === 'undefined' || requestOptions.https) {
       options.https = true

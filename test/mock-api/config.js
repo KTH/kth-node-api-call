@@ -80,5 +80,13 @@ module.exports = {
         body: req.body,
       }),
     },
+    {
+      method: 'get',
+      url: '/api/test/options',
+      response: () => ({
+        statusCode: 200,
+        body: {},
+      }),
+    },
   ],
 }
