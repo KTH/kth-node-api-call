@@ -80,6 +80,8 @@ function _createFetchWrapper(wrapperOptions, method) {
       opts.headers = { ...headers, ...options.headers }
       opts.headers[HEADER_CONTENT_TYPE] = MIME_JSON
       opts.body = JSON.stringify(opts.body)
+    } else {
+      opts = {}
     }
     const forceBuffer = opts.encoding === null
 
