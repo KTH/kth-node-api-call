@@ -65,7 +65,7 @@ function connect(api, opts) {
         opts.log.info(`${NAME} Connected to api: ${api.key}`)
         return api
       }
-      opts.log.warn(
+      opts.log.info(
         `${NAME} ${data.statusCode} We had problems accessing ${api.key} . Check path and keys if this issue persists. We will retry in ${opts.timeout}ms`
       )
       setTimeout(() => {

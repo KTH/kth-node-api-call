@@ -93,7 +93,7 @@ const retryWrapper = (_this, cb, args) => {
         counter++
         const myUrl = typeof args[2] === 'object' ? args[2].uri : args[2]
         if (_this._log) {
-          _this._log.warn(
+          _this._log.info(
             `Request with guid ${_this.lastRequestGuid} to "${myUrl}" failed, Retry ${counter}/${_this._maxNumberOfRetries}`
           )
         }
