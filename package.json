@@ -35,7 +35,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@kth/eslint-config-kth": "^2.0.2",
+    "@kth/eslint-config-kth": "^3.0.4",
     "@moebius/http-graceful-shutdown": "^1.1.0",
     "@types/jest": "^27.0.3",
     "body-parser": "^1.19.1",
