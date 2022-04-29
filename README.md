@@ -1,9 +1,5 @@
 # KTH API Call for Node
 
-[![Build Status](https://travis-ci.org/kth/kth-node-api-call.svg?branch=master)](https://travis-ci.org/kth/kth-node-api-call)
-
-## Overview
-
 Node module used to make JSON calls against APIs. (Previously published as `kth-node-api-call`, now `@kth/api-call`.)
 
 To use in your node project, run:
