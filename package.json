@@ -37,7 +37,7 @@
   "devDependencies": {
     "@kth/eslint-config-kth": "^3.0.10",
     "@moebius/http-graceful-shutdown": "^1.1.0",
-    "@types/jest": "^27.5.2",
+    "@types/jest": "^28.1.7",
     "body-parser": "^1.20.0",
     "eslint": "^8.20.0",
     "express": "^4.18.1",
