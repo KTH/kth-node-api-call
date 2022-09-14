@@ -6,9 +6,9 @@ describe('Package "@kth/api-call"', () => {
   it(`has all the expected exports`, () => {
     const copy = copyObject(apiCall, { replaceFunctions: true })
     expect(copy).toMatchInlineSnapshot(`
-      Object {
+      {
         "BasicAPI": "(FUNC:BasicAPI)",
-        "Connections": Object {
+        "Connections": {
           "setup": "(FUNC:setup)",
         },
         "cachedApi": "(FUNC:factory)",
