@@ -9,3 +9,6 @@ updates:
     labels:
       - dependencies
       - dependabot
+    ignore:
+      - dependency-name: 'eslint'
+        versions: ['9.x']
