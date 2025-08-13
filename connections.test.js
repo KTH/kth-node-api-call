@@ -2,7 +2,7 @@
 
 jest.mock('kth-node-redis')
 
-const redisClient = require('redis-mock').createClient()
+const redisClient = {}
 
 const { IS_ACCESSIBLE } = require('./test-utils')
 
