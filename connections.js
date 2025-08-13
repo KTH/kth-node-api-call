@@ -1,5 +1,6 @@
 'use strict'
 
+const redis = require('kth-node-redis')
 const urlJoin = require('url-join')
 const BasicAPI = require('./basic')
 
@@ -142,7 +143,6 @@ function getRedisConfig(apiName, cache) {
 function getRedisClient(apiName, opts) {
   return new Promise((resolve, reject) => {
     const cache = opts.cache ? opts.cache : {}
-    const { redis } = opts
     try {
       if (cache[apiName]) {
         const cacheConfig = getRedisConfig(apiName, cache)
@@ -185,6 +185,14 @@ function setup(apisConfig, apisKeyConfig, opts) {
   }
   const myApisKeyConfig = { ...apisKeyConfig }
   const myOpts = { log: defaultLog, timeout: defaultTimeout, ...opts }
+
+  if (myOpts.redis) {
+    myOpts.log.warn(
+      `⚠️ ${NAME} / connections.setup ⚠️ This function no longer takes a "redis" instance as a parameter. A local dependency will be used instead`
+    )
+    delete myOpts.redis
+  }
+
   const output = {}
 
   const apis = createApis(apisConfig, myApisKeyConfig, myOpts)
