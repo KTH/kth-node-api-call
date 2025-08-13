@@ -32,14 +32,12 @@ const opts = {
   log: mockLogger,
   redis: {
     prefix: 'mocktest',
-    client() {
-      return Promise.resolve({
-        set: redisSet,
-        get: redisGet,
-        expire: (key, limit, callback) => {
-          callback(undefined, 'OK')
-        },
-      })
+    client: {
+      set: redisSet,
+      get: redisGet,
+      expire: (key, limit, callback) => {
+        callback(undefined, 'OK')
+      },
     },
     expire: undefined,
   },

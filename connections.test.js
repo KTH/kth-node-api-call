@@ -1,4 +1,7 @@
 /* eslint-disable no-console */
+
+jest.mock('kth-node-redis')
+
 const redisClient = require('redis-mock').createClient()
 
 const { IS_ACCESSIBLE } = require('./test-utils')

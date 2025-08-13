@@ -146,7 +146,7 @@ function getRedisClient(apiName, opts) {
     try {
       if (cache[apiName]) {
         const cacheConfig = getRedisConfig(apiName, cache)
-        resolve(() => redis(apiName, cacheConfig.redis))
+        resolve(redis(apiName, cacheConfig.redis))
       }
     } catch (err) {
       opts.log.error('Error creating Redis client', err)
