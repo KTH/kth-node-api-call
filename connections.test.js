@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-jest.mock('kth-node-redis')
+jest.mock('./redisWrapper')
 
 const redisClient = {}
 

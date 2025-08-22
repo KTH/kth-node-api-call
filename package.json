@@ -29,7 +29,6 @@
   ],
   "dependencies": {
     "form-data": "^4.0.4",
-    "kth-node-redis": "^3.4.0",
     "node-fetch": "^2.7.0",
     "url-join": "^4.0.1",
     "uuid": "^8.3.2"
