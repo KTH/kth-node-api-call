@@ -13,7 +13,7 @@ const isKthRedis3 = (redisDependency, client) =>
   typeof client.setAsync === 'function'
 
 const createKthRedis3Wrapper = client => ({
-  guessedVersion: 'kth-node-redis@3',
+  detectedVersion: 'kth-node-redis@3',
   set: async (key, value, callback) => {
     return client.set(key, value, callback)
   },
