@@ -136,28 +136,14 @@ function _wrapCallback(api, options, method, callback) {
       const redisData = { ...result, body }
       const value = JSON.stringify(redisData)
 
-      let redisMaybeFnc = api._redis.client
-      if (typeof api._redis.client === 'function') {
-        const { clientName, clientOptions } = api._redis
-        if (clientName == null && clientOptions == null) {
-          redisMaybeFnc = api._redis.client()
-        } else {
-          redisMaybeFnc = api._redis.client(clientName || 'default', clientOptions || null)
-        }
-      }
+      const redisClient = api._redis.client
 
-      Promise.resolve(redisMaybeFnc)
-        .then(client => {
-          client.set(key, value, err => {
-            if (err) callback(err)
-          })
-          client.expire(key, api._redis.expire || 300, err => {
-            if (err) callback(err)
-          })
-        })
-        .catch(err => {
-          callback(err)
-        })
+      redisClient.set(key, value, err => {
+        if (err) callback(err)
+      })
+      redisClient.expire(key, api._redis.expire || 300, err => {
+        if (err) callback(err)
+      })
     }
 
     callback(error, result, body)
