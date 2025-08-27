@@ -1,5 +1,7 @@
 'use strict'
 
+const { createRedisWrapper } = require('./redisWrapper')
+
 const urlJoin = require('url-join')
 const BasicAPI = require('./basic')
 
@@ -146,7 +148,7 @@ function getRedisClient(apiName, opts) {
     try {
       if (cache[apiName]) {
         const cacheConfig = getRedisConfig(apiName, cache)
-        resolve(() => redis(apiName, cacheConfig.redis))
+        resolve(createRedisWrapper(apiName, redis, cacheConfig.redis))
       }
     } catch (err) {
       opts.log.error('Error creating Redis client', err)
@@ -171,6 +173,10 @@ function configureApiCache(connectedApi, opts) {
       })
       .catch(err => {
         opts.log.error('Unable to create redisClient', { error: err })
+        if (err.message.includes('unsupported Redis version')) {
+          opts.log.error(err)
+          process.exit(1)
+        }
         connectedApi.client._hasRedis = false // eslint-disable-line no-param-reassign
       })
     opts.log.debug(`API configured to use redis cache: ${apiName}`)

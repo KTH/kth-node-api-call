@@ -1,5 +1,8 @@
 /* eslint-disable no-console */
-const redisClient = require('redis-mock').createClient()
+
+jest.mock('./redisWrapper')
+
+const redisClient = {}
 
 const { IS_ACCESSIBLE } = require('./test-utils')
 
