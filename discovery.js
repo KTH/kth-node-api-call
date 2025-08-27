@@ -6,6 +6,8 @@
 const api = require('./api')
 
 module.exports = (function () {
+  console.warn('⚠️ @kth/api-call/discovery is deprecated and will be removed ⚠️')
+
   /**
    * Factory function to hide class instantiation.
    *

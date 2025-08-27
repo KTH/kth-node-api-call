@@ -5,7 +5,6 @@
 const express = require('express')
 const formData = require('express-form-data')
 const bodyParser = require('body-parser')
-const { GracefulShutdownManager } = require('@moebius/http-graceful-shutdown')
 const config = require('./config')
 
 module.exports = async () => {
@@ -25,11 +24,10 @@ module.exports = async () => {
   })
 
   const server = app.listen(config.host.port, config.host.address)
-  const shutdownManager = new GracefulShutdownManager(server)
 
   app.get('/api/test/goodbye', (req, res) => {
     setTimeout(() => {
-      shutdownManager.terminate(() => {})
+      server.close()
     }, 500)
     res.status(200).send({ status: 'Shutdown' })
   })

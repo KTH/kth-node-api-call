@@ -2,6 +2,8 @@
 const api = require('./api')
 
 module.exports = (function () {
+  console.warn('⚠️ @kth/api-call/tokenCall is deprecated and will be removed ⚠️')
+
   function TokenCall(options) {
     this.options = options || {}
     this.options.tokenEndpoint = options.tokenEndpoint

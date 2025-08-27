@@ -7,6 +7,8 @@
 const apiCaller = require('./api')
 
 module.exports = (function () {
+  console.warn('⚠️ @kth/api-call/cachedApi is deprecated and will be removed ⚠️')
+
   /**
    * Wrap our constructor in a factory method.
    * @param options our options object
