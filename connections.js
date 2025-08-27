@@ -147,6 +147,9 @@ function getRedisClient(apiName, opts) {
     const { redis } = opts
     try {
       if (cache[apiName]) {
+        if (!redis) {
+          throw new Error('@kth/api-call Option "cache" was passed without a "redis" object')
+        }
         const cacheConfig = getRedisConfig(apiName, cache)
         resolve(createRedisWrapper(apiName, redis, cacheConfig.redis))
       }
