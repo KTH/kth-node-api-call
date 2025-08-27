@@ -185,9 +185,11 @@ function _exec(api, options, method, callback) {
         client =>
           new Promise((resolve, reject) => {
             client.get(key, (err, reply) => {
-              if (err || !reply) {
+              if (err) {
                 api._log.error('@kth/api-call redis.get failed', err)
                 reject(err)
+              } else if (!reply) {
+                reject()
               } else {
                 // TODO: Should we catch parse errors and return a reasonable message or
                 // is this good enough?
