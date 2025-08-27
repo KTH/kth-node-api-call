@@ -11,8 +11,6 @@ describe('Package "@kth/api-call"', () => {
         "Connections": {
           "setup": "(FUNC:setup)",
         },
-        "cachedApi": "(FUNC:factory)",
-        "oidcApi": "(FUNC:factory)",
       }
     `)
   })
