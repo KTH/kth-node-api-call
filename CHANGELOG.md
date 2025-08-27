@@ -4,6 +4,10 @@ All notable changes for major version updates will be documented here.
 
 ## 4.3.0
 
+### Added
+
+Redis operations will log errors instead of just failing silently
+
 ### Changed
 
 Will fail and exit on statup if an unsupported "redis" instance is passed.

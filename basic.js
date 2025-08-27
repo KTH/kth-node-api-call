@@ -139,10 +139,16 @@ function _wrapCallback(api, options, method, callback) {
       const redisClient = api._redis.client
 
       redisClient.set(key, value, err => {
-        if (err) callback(err)
+        if (err) {
+          api._log.error('@kth/api-call redis.set failed', err)
+          callback(err)
+        }
       })
       redisClient.expire(key, api._redis.expire || 300, err => {
-        if (err) callback(err)
+        if (err) {
+          api._log.error('@kth/api-call redis.expire failed', err)
+          callback(err)
+        }
       })
     }
 
@@ -180,6 +186,7 @@ function _exec(api, options, method, callback) {
           new Promise((resolve, reject) => {
             client.get(key, (err, reply) => {
               if (err || !reply) {
+                api._log.error('@kth/api-call redis.get failed', err)
                 reject(err)
               } else {
                 // TODO: Should we catch parse errors and return a reasonable message or
