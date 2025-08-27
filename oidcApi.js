@@ -12,6 +12,8 @@ const discovery = require('./discovery')
 const tokenCall = require('./tokenCall')
 
 module.exports = (function () {
+  console.warn('⚠️ @kth/api-call/oidcApi is deprecated and will be removed ⚠️')
+
   /**
    * Wrap our constructor in a factory method.
    * @param options our options object
