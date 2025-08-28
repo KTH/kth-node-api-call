@@ -31,14 +31,14 @@ const opts = {
   basePath: '/api/test',
   log: mockLogger,
   redis: {
-    prefix: 'mocktest',
-    client: {
+    getClient: async () => ({
       set: redisSet,
       get: redisGet,
       expire: (key, limit, callback) => {
         callback(undefined, 'OK')
       },
-    },
+    }),
+    prefix: 'mocktest',
     expire: undefined,
   },
 }

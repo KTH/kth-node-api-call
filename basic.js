@@ -57,7 +57,7 @@ function BasicAPI(options, base) {
 
     this._request = fetchWrappers(opts)
     this._redis = myOptions.redis
-    this._hasRedis = !!(this._redis && this._redis.client)
+    this._hasRedis = !!(this._redis && (this._redis.client || this._redis.getClient ))
     this._basePath = myOptions.basePath || ''
     this._defaultTimeout = myOptions.defaultTimeout || 2000
     this._retryOnESOCKETTIMEDOUT = myOptions.retryOnESOCKETTIMEDOUT ? myOptions.retryOnESOCKETTIMEDOUT : undefined
@@ -125,7 +125,7 @@ function _getKey(api, options, method) {
 }
 
 function _wrapCallback(api, options, method, callback) {
-  return (error, result, body) => {
+  return async (error, result, body) => {
     if (error) {
       callback(error, result, body)
       return
@@ -136,7 +136,7 @@ function _wrapCallback(api, options, method, callback) {
       const redisData = { ...result, body }
       const value = JSON.stringify(redisData)
 
-      const redisClient = api._redis.client
+      const redisClient = await api._redis.getClient()
 
       redisClient.set(key, value, err => {
         if (err) {
@@ -178,9 +178,7 @@ function _exec(api, options, method, callback) {
   if (api._hasRedis && options.useCache) {
     const key = _getKey(api, options, method)
 
-    const redisMaybeFnc = typeof api._redis.client === 'function' ? api._redis.client() : api._redis.client
-
-    Promise.resolve(redisMaybeFnc)
+    Promise.resolve(api._redis.getClient())
       .then(
         client =>
           new Promise((resolve, reject) => {
