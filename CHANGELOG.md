@@ -2,6 +2,12 @@
 
 All notable changes for major version updates will be documented here.
 
+## 4.3.1
+
+### Bugfix
+
+Issues with redis not reconnecting in 4.3.0
+
 ## 4.3.0
 
 ### Added
