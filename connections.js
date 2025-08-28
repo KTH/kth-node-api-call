@@ -151,7 +151,7 @@ function getRedisClient(apiName, opts) {
           throw new Error('@kth/api-call Option "cache" was passed without a "redis" object')
         }
         const cacheConfig = getRedisConfig(apiName, cache)
-        resolve(createRedisWrapper(apiName, redis, cacheConfig.redis))
+        resolve(() => createRedisWrapper(apiName, redis, cacheConfig.redis))
       }
     } catch (err) {
       opts.log.error('Error creating Redis client', err)
@@ -170,7 +170,7 @@ function configureApiCache(connectedApi, opts) {
         // eslint-disable-next-line no-param-reassign
         connectedApi.client._redis = {
           prefix: apiName,
-          client: getRedisClientFnc,
+          getClient: getRedisClientFnc,
           expire: getRedisConfig(apiName, opts.cache).expireTime,
         }
       })
