@@ -3,6 +3,9 @@
   "version": "4.3.1",
   "description": "Node.js module to make JSON calls against APIs.",
   "main": "index.js",
+  "files": [
+    "**/*.js"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/KTH/kth-node-api-call"
