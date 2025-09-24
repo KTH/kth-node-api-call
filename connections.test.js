@@ -70,7 +70,7 @@ describe('Testing connection', () => {
   it(IS_ACCESSIBLE, () => expect(connections.setup).toBeFunction())
 
   it('should throw exception if no api config is provided or not object', () => {
-    expect(() => connections.setup('INVALID', mockApiKeyConfig, opts)).toThrowError(/Apis config is required/)
+    expect(() => connections.setup('INVALID', mockApiKeyConfig, opts)).toThrow(/Apis config is required/)
   })
 
   it('should shut down on bad API key', done => {
@@ -80,7 +80,7 @@ describe('Testing connection', () => {
     connections.setup(mockApiConfig, mockApiKeyConfig, opts)
 
     setTimeout(() => {
-      expect(process.exit).toBeCalledWith(1)
+      expect(process.exit).toHaveBeenCalledWith(1)
       done()
     }, 500) // wait for setup to finish
   })
@@ -106,8 +106,8 @@ describe('Testing connection', () => {
 
     const output = connections.setup(mockApiConfig, mockApiKeyConfig, opts)
     setTimeout(() => {
-      expect(process.exit).not.toBeCalled()
-      expect(output.testApi.client.getAsync).toBeCalled()
+      expect(process.exit).not.toHaveBeenCalled()
+      expect(output.testApi.client.getAsync).toHaveBeenCalled()
       done()
     }, 500) // wait for setup to finish
   })
@@ -122,9 +122,9 @@ describe('Testing connection', () => {
     )
     setTimeout(() => {
       expect(output.testApi.connected).toBeTrue()
-      expect(process.exit).not.toBeCalled()
+      expect(process.exit).not.toHaveBeenCalled()
       // Should only be called once to check API key
-      expect(output.testApi.client.getAsync).toBeCalledTimes(1)
+      expect(output.testApi.client.getAsync).toHaveBeenCalledTimes(1)
       done()
     }, 500) // wait for setup to finish
   })
@@ -152,7 +152,7 @@ describe('Testing connection', () => {
     const output = connections.setup(mockApiConfig, mockApiKeyConfig, opts)
     setTimeout(() => {
       expect(output.testApi.connected).toBeTrue()
-      expect(process.exit).not.toBeCalled()
+      expect(process.exit).not.toHaveBeenCalled()
       done()
     }, 500) // wait for setup to finish
   })

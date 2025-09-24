@@ -176,15 +176,15 @@ describe('basic calls works as expected', () => {
     const result = await api.getAsync({ uri: '/cached', useCache: true })
     expect(result.body).toBe('from cache')
     expect(result.statusCode).toBe(200)
-    expect(redisGet).toBeCalledWith('mocktest:get:/api/test/cached', expect.anything())
+    expect(redisGet).toHaveBeenCalledWith('mocktest:get:/api/test/cached', expect.anything())
   })
 
   it('should cache value if cache is enabled when calling getAsync', async () => {
     const result = await api.getAsync({ uri: '/method', useCache: true, qs: { param: 'test' } })
     expect(result.body.method).toBe('get')
     expect(result.statusCode).toBe(200)
-    expect(redisGet).toBeCalledWith('mocktest:get:/api/test/method?param=test', expect.anything())
-    expect(redisSet).toBeCalledWith(
+    expect(redisGet).toHaveBeenCalledWith('mocktest:get:/api/test/method?param=test', expect.anything())
+    expect(redisSet).toHaveBeenCalledWith(
       'mocktest:get:/api/test/method?param=test',
       '{"size":0,"timeout":50,"statusCode":200,"body":{"method":"get","query":{"param":"test"}}}',
       expect.anything()
@@ -199,7 +199,7 @@ describe('basic calls works as expected', () => {
 
     await api.postAsync('/timeout').catch(e => {
       expect(e.message).toContain('timed out after 2 retries. The connection to the API seems to be overloaded.')
-      expect(api._request.post).toBeCalledTimes(3)
+      expect(api._request.post).toHaveBeenCalledTimes(3)
     })
   })
   it('should not retry on timeout', async () => {
@@ -209,7 +209,7 @@ describe('basic calls works as expected', () => {
 
     await noRetryApi.postAsync('/timeout').catch(e => {
       expect(e.message).toContain('ESOCKETTIMEDOUT')
-      expect(noRetryApi._request.post).toBeCalledTimes(1)
+      expect(noRetryApi._request.post).toHaveBeenCalledTimes(1)
     })
   })
 
