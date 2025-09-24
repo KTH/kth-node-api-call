@@ -4,6 +4,10 @@ All notable changes for major version updates will be documented here.
 
 ## 4.4.0
 
+### Changed
+
+Items will only be saved in cache when the useCache flag is used.
+
 ### Added
 
 Support for using cache in combination with upcoming kth-node-redis@4.

@@ -132,7 +132,7 @@ function _wrapCallback(api, options, method, callback) {
       return
     }
 
-    if (api._hasRedis && result.statusCode >= 200 && result.statusCode < 400) {
+    if (api._hasRedis && options.useCache && result.statusCode >= 200 && result.statusCode < 400) {
       setRedisResult(api, options, method, result, body)
     }
 
