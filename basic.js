@@ -7,6 +7,7 @@ const { v4: uuidv4 } = require('uuid')
 const { fetchWrappers, removeUndefined } = require('./fetchUtils')
 
 const REQUEST_GUID = 'request-guid'
+const NO_REPLY_REJECT_CODE = 'no_reply'
 
 function _toBaseUrl({ protocol, https, host, hostname, port }) {
   let baseurl = host || hostname || 'http://localhost'
@@ -132,27 +133,33 @@ function _wrapCallback(api, options, method, callback) {
     }
 
     if (api._hasRedis && result.statusCode >= 200 && result.statusCode < 400) {
-      const key = _getKey(api, options, method)
-      const redisData = { ...result, body }
-      const value = JSON.stringify(redisData)
-
-      const redisClient = await api._redis.getClient()
-
-      redisClient.set(key, value, err => {
-        if (err) {
-          api._log.error('@kth/api-call redis.set failed', err)
-          callback(err)
-        }
-      })
-      redisClient.expire(key, api._redis.expire || 300, err => {
-        if (err) {
-          api._log.error('@kth/api-call redis.expire failed', err)
-          callback(err)
-        }
-      })
+      setRedisResult(api, options, method, result, body)
     }
 
     callback(error, result, body)
+  }
+}
+
+const setRedisResult = async (api, options, method, result, body) => {
+  const key = _getKey(api, options, method)
+  const redisData = { ...result, body }
+  const value = JSON.stringify(redisData)
+
+  try {
+    const redisClient = await api._redis.getClient()
+
+    redisClient.set(key, value, err => {
+      if (err) {
+        api._log.error('@kth/api-call redis.set failed', err)
+      }
+    })
+    redisClient.expire(key, api._redis.expire || 300, err => {
+      if (err) {
+        api._log.error('@kth/api-call redis.expire failed', err)
+      }
+    })
+  } catch (error) {
+    api._log.error('@kth/api-call caching result in Redis failed', error)
   }
 }
 
@@ -182,22 +189,30 @@ function _exec(api, options, method, callback) {
       .then(
         client =>
           new Promise((resolve, reject) => {
-            client.get(key, (err, reply) => {
-              if (err) {
-                api._log.error('@kth/api-call redis.get failed', err)
-                reject(err)
-              } else if (!reply) {
-                reject()
-              } else {
-                // TODO: Should we catch parse errors and return a reasonable message or
-                // is this good enough?
-                const value = JSON.parse(reply)
-                resolve(callback(null, value, value.body))
-              }
-            })
+            client
+              .get(key, (err, reply) => {
+                if (err) {
+                  reject(err)
+                } else if (!reply) {
+                  reject(NO_REPLY_REJECT_CODE)
+                } else {
+                  // TODO: Should we catch parse errors and return a reasonable message or
+                  // is this good enough?
+                  const value = JSON.parse(reply)
+                  resolve(callback(null, value, value.body))
+                }
+              })
+              .catch(error => {
+                reject(error)
+              })
           })
       )
-      .catch(() => _makeRequest(api, options, method, callback))
+      .catch(error => {
+        if (error !== NO_REPLY_REJECT_CODE) {
+          api._log.error('@kth/api-call could not get cached result from Redis', error)
+        }
+        _makeRequest(api, options, method, callback)
+      })
   } else {
     _makeRequest(api, options, method, callback)
   }
