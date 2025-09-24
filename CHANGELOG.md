@@ -2,6 +2,12 @@
 
 All notable changes for major version updates will be documented here.
 
+## 4.4.0
+
+### Added
+
+Support for using cache in combination with upcoming kth-node-redis@4.
+
 ## 4.3.1
 
 ### Bugfix
