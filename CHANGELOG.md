@@ -2,6 +2,12 @@
 
 All notable changes for major version updates will be documented here.
 
+## 4.5.0
+
+### Changed
+
+Removed dependency to `uuid`.
+
 ## 4.4.0
 
 ### Changed
