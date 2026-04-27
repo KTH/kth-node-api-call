@@ -6,8 +6,6 @@
 const { randomUUID } = require('crypto')
 const { fetchWrapper } = require('./fetchUtils')
 
-// throw '🧨'
-
 module.exports = (function () {
   console.warn('⚠️ @kth/api-call/api is deprecated and will be removed ⚠️')
   const MIME_JSON = 'application/json'

@@ -264,7 +264,6 @@ function _createPromise(api, func, options) {
  * @returns {Promise}
  */
 BasicAPI.prototype.getAsync = function (options) {
-  console.log('🟠 using getAsync')
   if (this._retryOnESOCKETTIMEDOUT) {
     return retryWrapper(this, _createPromise, [this, this.get, options])
   }
