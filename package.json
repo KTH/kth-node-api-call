@@ -36,7 +36,7 @@
     "url-join": "^4.0.1"
   },
   "devDependencies": {
-    "@kth/eslint-config-kth": "^3.7.0",
+    "@kth/eslint-config-kth": "^4.0.0",
     "@types/jest": "^30.0.0",
     "body-parser": "^2.2.2",
     "eslint": "^9.39.4",
