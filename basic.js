@@ -3,7 +3,7 @@
 'use strict'
 
 const urlJoin = require('url-join')
-const { v4: uuidv4 } = require('uuid')
+const { randomUUID } = require('crypto')
 const { fetchWrappers, removeUndefined } = require('./fetchUtils')
 
 const REQUEST_GUID = 'request-guid'
@@ -58,7 +58,7 @@ function BasicAPI(options, base) {
 
     this._request = fetchWrappers(opts)
     this._redis = myOptions.redis
-    this._hasRedis = !!(this._redis && (this._redis.client || this._redis.getClient ))
+    this._hasRedis = !!(this._redis && (this._redis.client || this._redis.getClient))
     this._basePath = myOptions.basePath || ''
     this._defaultTimeout = myOptions.defaultTimeout || 2000
     this._retryOnESOCKETTIMEDOUT = myOptions.retryOnESOCKETTIMEDOUT ? myOptions.retryOnESOCKETTIMEDOUT : undefined
@@ -169,12 +169,13 @@ function _makeRequest(api, options, method, callback) {
   if (typeof options === 'string') {
     opts = {
       uri: options,
-      requestGuid: uuidv4(),
+      requestGuid: randomUUID(),
       headers: {},
     }
   } else {
-    opts = { headers: {}, requestGuid: uuidv4(), ...options }
+    opts = { headers: {}, requestGuid: randomUUID(), ...options }
   }
+  console.log('🟢 _makeRequest', opts)
   opts.headers[REQUEST_GUID] = opts.requestGuid
   api.lastRequestGuid = opts.requestGuid // eslint-disable-line no-param-reassign
   const cb = _wrapCallback(api, opts, method, callback)
@@ -264,6 +265,7 @@ function _createPromise(api, func, options) {
  * @returns {Promise}
  */
 BasicAPI.prototype.getAsync = function (options) {
+  console.log('🟠 using getAsync')
   if (this._retryOnESOCKETTIMEDOUT) {
     return retryWrapper(this, _createPromise, [this, this.get, options])
   }

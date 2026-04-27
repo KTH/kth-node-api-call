@@ -3,10 +3,13 @@
  * Class to handle json api calls
  * @type {*}
  */
-const { v4: uuidv4 } = require('uuid')
+const { randomUUID } = require('crypto')
 const { fetchWrapper } = require('./fetchUtils')
 
+// throw '🧨'
+
 module.exports = (function () {
+  console.warn('⚠️ @kth/api-call/api is deprecated and will be removed ⚠️')
   const MIME_JSON = 'application/json'
   const MIME_TEXT = 'text/plain'
   const HEADER_ACCEPT = 'accept'
@@ -162,7 +165,7 @@ module.exports = (function () {
   Api.prototype.getJson = function (onSuccess, onError) {
     const self = this
     self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_JSON
-    self.httpRequestSettings.headers[REQUEST_GUID] = uuidv4()
+    self.httpRequestSettings.headers[REQUEST_GUID] = randomUUID()
     self.httpRequestSettings.method = 'GET'
     delete self.httpRequestSettings.body
 
@@ -179,7 +182,7 @@ module.exports = (function () {
     const self = this
     self.json = false
     self.httpRequestSettings.headers[HEADER_ACCEPT] = MIME_TEXT
-    self.httpRequestSettings.headers[REQUEST_GUID] = uuidv4()
+    self.httpRequestSettings.headers[REQUEST_GUID] = randomUUID()
     self.httpRequestSettings.method = 'GET'
     delete self.httpRequestSettings.body
 
@@ -198,7 +201,7 @@ module.exports = (function () {
     self.httpRequestSettings.json = true
     self.httpRequestSettings.method = 'POST'
     self.httpRequestSettings.body = data
-    self.httpRequestSettings.headers[REQUEST_GUID] = uuidv4()
+    self.httpRequestSettings.headers[REQUEST_GUID] = randomUUID()
 
     self.request(onSuccess, onError)
   }
@@ -240,7 +243,7 @@ module.exports = (function () {
   Api.prototype.promisedApiCall = function () {
     return new Promise((resolve, reject) => {
       this.httpRequestSettings.headers[HEADER_ACCEPT] = '*/*'
-      this.httpRequestSettings.headers[REQUEST_GUID] = uuidv4()
+      this.httpRequestSettings.headers[REQUEST_GUID] = randomUUID()
       this.httpRequestSettings.method = 'GET'
       delete this.httpRequestSettings.body
 
