@@ -175,7 +175,6 @@ function _makeRequest(api, options, method, callback) {
   } else {
     opts = { headers: {}, requestGuid: randomUUID(), ...options }
   }
-  console.log('🟢 _makeRequest', opts)
   opts.headers[REQUEST_GUID] = opts.requestGuid
   api.lastRequestGuid = opts.requestGuid // eslint-disable-line no-param-reassign
   const cb = _wrapCallback(api, opts, method, callback)
