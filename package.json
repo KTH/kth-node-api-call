@@ -36,18 +36,18 @@
     "url-join": "^4.0.1"
   },
   "devDependencies": {
-    "@kth/eslint-config-kth": "^3.7.0",
+    "@kth/eslint-config-kth": "^4.1.0",
     "@types/jest": "^30.0.0",
-    "body-parser": "^2.2.2",
-    "eslint": "^9.39.4",
-    "express": "^4.22.1",
+    "body-parser": "^2.4.0",
+    "eslint": "^9.39.5",
+    "express": "^4.22.3",
     "express-form-data": "^3.0.1",
     "husky": "^9.1.7",
-    "jest": "^30.3.0",
-    "jest-extended": "^6.0.0",
-    "lint-staged": "^16.4.0",
-    "prettier": "^3.8.3",
-    "qs": "^6.15.1"
+    "jest": "^30.5.2",
+    "jest-extended": "^7.0.0",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.10",
+    "qs": "^6.16.1"
   },
   "// (prettier)": "configuration version 2020-06-15 - might also reside in .prettierrc.json",
   "prettier": {
